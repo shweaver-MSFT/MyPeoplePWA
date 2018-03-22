@@ -24,6 +24,11 @@
         // private
         function onContactPanelActivated(args) {
             console.log("ContectPanel Activated");
+
+            // When your application is activated with this contract, it will receive a ContactPanelActivatedEventArgs object. 
+            // This contains the ID of the Contact that your application is trying to interact with on launch, and a ContactPanel object.
+            // You should keep a reference to this ContactPanel object, which will allow you to interact with the panel.
+            // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#running-in-the-contact-panel
         }
 
         // private
