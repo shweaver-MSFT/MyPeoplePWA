@@ -1,0 +1,47 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>MyPeople PWA</title>
+
+    <link href="css/global.css" rel="stylesheet">
+</head>
+
+<body>
+    <div>
+        <h1>MyPeople PWA</h1>
+        <hr />
+    </div>
+    <div id="container">
+        <button id="createContactButton">Create Contact</button>
+    </div>
+
+    <script src="js/activation.js"></script>
+    <script src="js/mypeople.js"></script>
+
+    <script>
+        console.log = function (msg) {
+            document.querySelector("#container").innerHTML += " | " + msg;
+        };
+
+        var activationService = document.activation;
+        console.log("activating...");
+        if (window.Windows && window.Windows.UI && window.Windows.UI.WebUI) {
+            Windows.UI.WebUI.WebUIApplication.addEventListener("activated", activationService.OnActivated);
+        }
+        else {
+            // Running on web, not UWP
+            activationService.OnActivated();
+        }
+
+        var createContactButton = document.querySelector("#createContactButton");
+        createContactButton.addEventListener("click", function () {
+            document.myPeople.CreatContact("contactId", "first", "last", "email", "phone");
+        });
+    </script>
+</body>
+</html>
