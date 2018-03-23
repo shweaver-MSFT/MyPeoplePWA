@@ -2,7 +2,7 @@
 
     var ActivationService = function () {
 
-        // private
+        // 
         function onLaunched(args) {
             console.log("Launch activated");
 
@@ -16,22 +16,32 @@
             }
         }
 
-        // private
+        // 
+        function onProtocolActivated(args) {
+            console.log("Protocol Activated");
+
+            var protocol = args.Uri.absoluteUri;
+            // TODO: Handle protocol activation
+        };
+
+        // 
         function onShareTargetActivated(args) {
             console.log("ShareTarget Activated");
+            // TODO: Handle shareTarget activation
         }
 
-        // private
+        // When your application is activated with this contract, it will receive a ContactPanelActivatedEventArgs object. 
+        // This contains the ID of the Contact that your application is trying to interact with on launch, and a ContactPanel object.
+        // You should keep a reference to this ContactPanel object, which will allow you to interact with the panel.
+        // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#running-in-the-contact-panel
         function onContactPanelActivated(args) {
             console.log("ContectPanel Activated");
 
-            // When your application is activated with this contract, it will receive a ContactPanelActivatedEventArgs object. 
-            // This contains the ID of the Contact that your application is trying to interact with on launch, and a ContactPanel object.
-            // You should keep a reference to this ContactPanel object, which will allow you to interact with the panel.
-            // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#running-in-the-contact-panel
+            var contactPanel = args.contactPanel; // TODO: Check that this is right
+            document.myPeople.RegisterContactPanel(contactPanel);
         }
 
-        // private
+        // 
         function onWebActivated(args) {
             console.log("Web Activated");
         }
@@ -41,7 +51,6 @@
 
         // Handles app activation
         this.OnActivated = function (args) {
-            console.log("OnActivated");
 
             this.LastActivationArgs = args;
 
@@ -56,16 +65,21 @@
 
                 switch (args.kind) {
                     case activation.ActivationKind.launch: onLaunched(args); return;
+                    case activation.ActivationKind.protocol: onProtocolActivated(args); return;
                     case activation.ActivationKind.shareTarget: onShareTargetActivated(args); return;
                     case activation.ActivationKind.contactPanel: onContactPanelActivated(args); return;
                 }
+            }
 
-                console.log("Unhandled activation kind: " + args.kind);
-            }
-            else {
-                console.log("Unhandled activation: Missing args - " + args);
-            }
+            console.log("Unhandled activation: Missing args - " + args);
+            // TODO: Handle activation with invalid/missing args
+
         }.bind(this);
+
+        // 
+        this.LaunchSelf = function () {
+
+        }
     };
 
     var activationService = new ActivationService();

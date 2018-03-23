@@ -2,83 +2,16 @@
 
     var MyPeopleService = function () {
 
-        // To allow contacts from your application to appear in the taskbar via the My People pane, 
-        // you need to write them to the Windows contact store.
-        //
-        // Your application must also write an annotation to each contact. 
-        // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#annotating-contacts
-        this.CreateContact = function (contactId, firstName, lastName, email, phone) {
-            /*
-            Contact contact1 = new Contact();
-            contact1.FirstName = "TestContact1";
+        var registeredContactPanel;
 
-            ContactEmail email1 = new ContactEmail();
-            email1.Address = "TestContact1@contoso.com";
-            contact1.Emails.Add(email1);
-
-            ContactPhone phone1 = new ContactPhone();
-            phone1.Number = "4255550100";
-            contact1.Phones.Add(phone1);
-
-
-
-            // Save the contacts
-            var contactList = this.GetContactList();
-            if (null == contactList) {
-                return;
-            }
-
-            await contactList.SaveContactAsync(contact1);
-            await contactList.SaveContactAsync(contact2);
-
-            //
-            // Create annotations for those test contacts.
-            // Annotation is the contact meta data that allows People App to generate deep links
-            // in the contact card that takes the user back into this app.
-            //
-
-            ContactAnnotationList annotationList = await _GetContactAnnotationList();
-            if (null == annotationList) {
-                return;
-            }
-
-            ContactAnnotation annotation = new ContactAnnotation();
-            annotation.ContactId = contact1.Id;
-
-            // Remote ID: The identifier of the user relevant for this app. When this app is
-            // launched into from the People App, this id will be provided as context on which user
-            // the operation (e.g. ContactProfile) is for.
-            annotation.RemoteId = "user12";
-
-            // The supported operations flags indicate that this app can fulfill these operations
-            // for this contact. These flags are read by apps such as the People App to create deep
-            // links back into this app. This app must also be registered for the relevant
-            // protocols in the Package.appxmanifest (in this case, ms-contact-profile).
-            annotation.SupportedOperations = ContactAnnotationOperations.ContactProfile;
-
-            if (!await annotationList.TrySaveAnnotationAsync(annotation)) {
-                rootPage.NotifyUser("Failed to save annotation for TestContact1 to the store.", NotifyType.ErrorMessage);
-                return;
-            }
-
-            annotation = new ContactAnnotation();
-            annotation.ContactId = contact2.Id;
-            annotation.RemoteId = "user22";
-
-            // You can also specify multiple supported operations for a contact in a single
-            // annotation. In this case, this annotation indicates that the user can be
-            // communicated via VOIP call, Video Call, or IM via this application.
-            annotation.SupportedOperations = ContactAnnotationOperations.Message |
-                ContactAnnotationOperations.AudioCall |
-                ContactAnnotationOperations.VideoCall;
-
-            if (!await annotationList.TrySaveAnnotationAsync(annotation)) {
-                rootPage.NotifyUser("Failed to save annotation for TestContact2 to the store.", NotifyType.ErrorMessage);
-                return;
-            }
-
-            rootPage.NotifyUser("Sample data created successfully.", NotifyType.StatusMessage);*/
-        }.bind(this);
+        // The PinnedContactManager is used to manage which contacts are pinned to the taskbar. 
+        // This class lets you pin and unpin contacts, determine whether a contact is pinned, 
+        // and determine if pinning on a particular surface is supported by the system your application is currently running on.
+        // You can retrieve the PinnedContactManager object using the GetDefault method:
+        // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#the-pinnedcontactmanager-class
+        function getPinnedContactManager () {
+            return Windows.ApplicationModel.Contacts.PinnedContactManager.GetDefault();
+        }
 
         // Annotations are pieces of data from your application that are associated with a contact. 
         // The annotation must contain the activatable class corresponding to your desired view in its ProviderProperties member, 
@@ -92,7 +25,6 @@
             }
 
             var apiInformation = Windows.Foundation.Metadata.ApiInformation;
-
             if (apiInformation.IsApiContractPresent("Windows.Foundation.UniversalApiContract", 5)) {
 
                 var contacts = Windows.ApplicationModel.Contacts;
@@ -111,24 +43,71 @@
             }
         }.bind(this);
 
-        // If you want contacts pinned to the taskbar to be badged when new notifications arrive from your app that are related to that person, 
-        // then you must include the hint - people parameter in your toast notifications and expressive My People notifications.
-        // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#supporting-notification-badging
-        this.PinContact = function (contactId) {
+        // You can pin contacts using the PinnedContactManager. 
+        // The RequestPinContactAsync method provides the user with a confirmation dialog, 
+        // so it must be called from your Application Single - Threaded Apartment(ASTA, or UI) thread.
+        // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#pinning-and-unpinning-contacts
+        this.PinContact = function (contact) {
+            var pinnedContactManager = this.getPinnedContactManager();
+            pinnedContactManager.requestPinContactAsync(contact, Windows.ApplicationModel.Contacts.PinnedContactSurface.taskbar);
         }.bind(this);
 
-        // 
-        this.DeleteContact = function (contactId) {
-
+        // You can now pin and unpin contacts using the PinnedContactManager.
+        // The RequestUnpinContactAsync method provides the user with a confirmation dialog,
+        // so it must be called from your Application Single - Threaded Apartment(ASTA, or UI) thread.
+        // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#pinning-and-unpinning-contacts
+        this.UnpinContact = function (contact) {
+            var pinnedContactManager = this.getPinnedContactManager();
+            pinnedContactManager.requestUnpinContactAsync(contact, Windows.ApplicationModel.Contacts.PinnedContactSurface.taskbar);
         }.bind(this);
 
-        // 
-        this.GetContactList = function () {
-
+        // You can pin multiple contacts at the same time using the PinnedContactManager.
+        // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#pinning-and-unpinning-contacts
+        this.PinMultipleContacts = function (contacts) {
+            var pinnedContactManager = this.getPinnedContactManager();
+            pinnedContactManager.RequestPinContactsAsync(contacts, Windows.ApplicationModel.Contacts.PinnedContactSurface.taskbar);
         }.bind(this);
 
-        // 
-        this.GetContactAnnotationList = function () {
+        // There is currently no batch operation for unpinning contacts.
+        // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#pinning-and-unpinning-contacts
+        this.UnpinMultipleContacts = function (contacts) {
+            for (var i = 0; i < contacts.length; i++) {
+                this.UnpinContact(contact[i]);
+            }
+        }.bind(this);
+
+        // The ContactPanel object has two events your application should listen for:
+        //
+        //   * The LaunchFullAppRequested event is sent when the user has invoked the UI element that 
+        //     requests that your full application be launched in its own window.
+        //     Your application is responsible for launching itself, passing along all necessary context.
+        //     You are free to do this however you’d like(for example, via protocol launch).
+        //
+        //   * The Closing event is sent when your application is about to be closed, allowing you to save any context.
+        //
+        // The ContactPanel object also allows you to set the background color of the contact panel header
+        // (if not set, it will default to the system theme) and to programmatically close the contact panel.
+        // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#running-in-the-contact-panel
+        this.RegisterContactPanel = function (contactPanel) {
+
+            registeredContactPanel = contactPanel;
+
+            // Occurs when the user clicks the Launch Full App button in the Contact Panel.
+            contactPanel.addEventListener("launchFullAppRequested", function () {
+
+                document.activation.LaunchSelf();
+
+                // Close the panel on app launch
+                registeredContactPanel.ClosePanel();
+            }).bind(this);
+
+            // Occurs when the Contact Panel is closing.
+            contactPanel.addEventListener("closing", function () {
+                
+            }).bind(this);
+
+            // Set the header color
+            contactPanel.headerColor = Windows.UI.Colors.Red;
 
         }.bind(this);
     };
