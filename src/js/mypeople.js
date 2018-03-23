@@ -27,19 +27,37 @@
             var apiInformation = Windows.Foundation.Metadata.ApiInformation;
             if (apiInformation.IsApiContractPresent("Windows.Foundation.UniversalApiContract", 5)) {
 
+                var annotationList = document.contacts.GetContactAnnotationList();
+                if (null == annotationList) {
+                    return;
+                }
+
                 var contacts = Windows.ApplicationModel.Contacts;
 
                 // Create a new contact annotation
                 var annotation = new contacts.ContactAnnotation();
                 annotation.contactId = contact.Id;
 
+                // Remote ID: The identifier of the user relevant for this app. When this app is
+                // launched into from the People App, this id will be provided as context on which user
+                // the operation (e.g. ContactProfile) is for.
+                annotation.RemoteId = contact.RemoteId;
+
                 // Add appId and contact panel support to the annotation
                 var appId = "MyPeoplePWA_80c4904e66sn0";
                 annotation.ProviderProperties.add("ContactPanelAppID", appId);
+
+                // The supported operations flags indicate that this app can fulfill these operations
+                // for this contact. These flags are read by apps such as the People App to create deep
+                // links back into this app. This app must also be registered for the relevant
+                // protocols in the Package.appxmanifest (in this case, ms-contact-profile).
                 annotation.SupportedOperations = contacts.ContactAnnotationOperations.contactProfile;
 
                 // Save annotation to contact annotation list
-                contacts.ContactAnnotationList.trySaveAnnotationAsync(annotation);
+                if (!await annotationList.TrySaveAnnotationAsync(annotation)) {
+                    console.log("Failed to save annotation for contact to the store.");
+                    return;
+                }
             }
         }.bind(this);
 
@@ -94,7 +112,7 @@
 
             // Occurs when the user clicks the Launch Full App button in the Contact Panel.
             contactPanel.addEventListener("launchFullAppRequested", function () {
-
+                console.log("Registered ContactPanel LaunchFullAppRequested");
                 document.activation.LaunchSelf();
 
                 // Close the panel on app launch
@@ -103,7 +121,7 @@
 
             // Occurs when the Contact Panel is closing.
             contactPanel.addEventListener("closing", function () {
-                
+                console.log("Registered ContactPanel Closing");
             }).bind(this);
 
             // Set the header color
