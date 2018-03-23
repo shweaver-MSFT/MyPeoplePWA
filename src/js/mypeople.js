@@ -1,5 +1,7 @@
 ﻿(function () {
 
+    var logger = document.logger;
+
     var MyPeopleService = function () {
 
         var registeredContactPanel;
@@ -20,7 +22,7 @@
         this.AnnotateContact = function (contact) {
 
             if (!window.Windows) {
-                console.log("MyPeople is not supported on web");
+                logger.Log("MyPeople is not supported on web");
                 return;
             }
 
@@ -55,7 +57,7 @@
 
                 // Save annotation to contact annotation list
                 if (!annotationList.trySaveAnnotationAsync(annotation)) {
-                    console.log("Failed to save annotation for contact to the store.");
+                    logger.Log("Failed to save annotation for contact to the store.");
                     return;
                 }
             }
@@ -67,7 +69,7 @@
         // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#pinning-and-unpinning-contacts
         this.PinContact = function (contact) {
             if (!window.Windows) {
-                console.log("MyPeople is not supported on web");
+                logger.Log("MyPeople is not supported on web");
                 return;
             }
 
@@ -81,7 +83,7 @@
         // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#pinning-and-unpinning-contacts
         this.UnpinContact = function (contact) {
             if (!window.Windows) {
-                console.log("MyPeople is not supported on web");
+                logger.Log("MyPeople is not supported on web");
                 return;
             }
 
@@ -93,7 +95,7 @@
         // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#pinning-and-unpinning-contacts
         this.PinMultipleContacts = function (contacts) {
             if (!window.Windows) {
-                console.log("MyPeople is not supported on web");
+                logger.Log("MyPeople is not supported on web");
                 return;
             }
 
@@ -105,7 +107,7 @@
         // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#pinning-and-unpinning-contacts
         this.UnpinMultipleContacts = function (contacts) {
             if (!window.Windows) {
-                console.log("MyPeople is not supported on web");
+                logger.Log("MyPeople is not supported on web");
                 return;
             }
 
@@ -132,7 +134,7 @@
 
             // Occurs when the user clicks the Launch Full App button in the Contact Panel.
             contactPanel.addEventListener("launchFullAppRequested", function () {
-                console.log("Registered ContactPanel LaunchFullAppRequested");
+                logger.Log("Registered ContactPanel LaunchFullAppRequested");
                 document.activation.LaunchSelf();
 
                 // Close the panel on app launch
@@ -141,7 +143,7 @@
 
             // Occurs when the Contact Panel is closing.
             contactPanel.addEventListener("closing", function () {
-                console.log("Registered ContactPanel Closing");
+                logger.Log("Registered ContactPanel Closing");
             }).bind(this);
 
             // Set the header color

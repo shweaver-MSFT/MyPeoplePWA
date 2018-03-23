@@ -1,10 +1,12 @@
 ﻿(function () {
 
+    var logger = document.logger;
+
     var ActivationService = function () {
 
         // 
         function onLaunched(args) {
-            console.log("Launch activated");
+            logger.Log("Launch activated");
 
             var activation = Windows.ApplicationModel.Activation;
 
@@ -18,7 +20,7 @@
 
         // 
         function onProtocolActivated(args) {
-            console.log("Protocol Activated");
+            logger.Log("Protocol Activated");
 
             var protocol = args.Uri.absoluteUri;
             // TODO: Handle protocol activation
@@ -26,7 +28,7 @@
 
         // 
         function onShareTargetActivated(args) {
-            console.log("ShareTarget Activated");
+            logger.Log("ShareTarget Activated");
             // TODO: Handle shareTarget activation
         }
 
@@ -35,15 +37,15 @@
         // You should keep a reference to this ContactPanel object, which will allow you to interact with the panel.
         // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#running-in-the-contact-panel
         function onContactPanelActivated(args) {
-            console.log("ContectPanel Activated");
+            logger.Log("ContectPanel Activated");
 
-            var contactPanel = args.contactPanel; // TODO: Check that this is right
+            var contactPanel = args.contactPanel; // TODO: Check that this is the right arg
             document.myPeople.RegisterContactPanel(contactPanel);
         }
 
         // 
         function onWebActivated(args) {
-            console.log("Web Activated");
+            logger.Log("Web Activated");
         }
 
         // The most recent activation args
@@ -71,7 +73,7 @@
                 }
             }
 
-            console.log("Unhandled activation: Missing args - " + args);
+            logger.Log("Unhandled activation: Missing args - " + args);
             // TODO: Handle activation with invalid/missing args
 
         }.bind(this);
@@ -94,5 +96,14 @@
 
     var activationService = new ActivationService();
     document.activation = activationService;
+
+    // Register for activation
+    if (window.Windows && window.Windows.UI && window.Windows.UI.WebUI) {
+        Windows.UI.WebUI.WebUIApplication.addEventListener("activated", activationService.OnActivated);
+    }
+    else {
+        // Running on web, not UWP
+        activationService.OnActivated();
+    }
 
 })();

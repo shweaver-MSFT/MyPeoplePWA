@@ -1,5 +1,7 @@
 ﻿(function () {
 
+    var logger = document.logger;
+
     var ContactsService = function () {
 
         // To allow contacts from your application to appear in the taskbar via the My People pane, 
@@ -8,7 +10,7 @@
         // Your application must also write an annotation to each contact. 
         // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#annotating-contacts
         this.CreateContact = function (contactId, firstName, lastName, email, phoneNumber) {
-
+            logger.log("ceateContact");
             var contacts = Windows.ApplicationModel.Contacts;
 
             var contact = new contacts.Contact();
@@ -23,13 +25,22 @@
             phone.Number = phoneNumber;
             contact.Phones.Add(phone);
 
-            // Save the contacts
+            logger.log("Get contact list");
+
+            // Save the contact
             var contactList = this.GetContactList();
             if (null == contactList) {
+                logger.log("contact list is null, return");
+
                 return;
             }
 
+            logger.log("Save the contact");
+
             contactList.SaveContactAsync(contact);
+
+            logger.log("Annotate the contact");
+
             document.myPeople.AnnotateContact(contact);
 
         }.bind(this);

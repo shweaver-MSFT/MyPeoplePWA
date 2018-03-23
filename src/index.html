@@ -20,27 +20,16 @@
         <button id="createContactButton">Create Contact</button>
     </div>
 
+    <!-- Include scripts at the end, for perf. -->
+    <script src="js/logger.js"></script>
     <script src="js/activation.js"></script>
+    <script src="js/contacts.js"></script>
     <script src="js/mypeople.js"></script>
-
     <script>
-        console.log = function (msg) {
-            document.querySelector("#container").innerHTML += " | " + msg;
-        };
-
-        var activationService = document.activation;
-
-        if (window.Windows && window.Windows.UI && window.Windows.UI.WebUI) {
-            Windows.UI.WebUI.WebUIApplication.addEventListener("activated", activationService.OnActivated);
-        }
-        else {
-            // Running on web, not UWP
-            activationService.OnActivated();
-        }
 
         var createContactButton = document.querySelector("#createContactButton");
         createContactButton.addEventListener("click", function () {
-            document.myPeople.CreateContact("contactId", "first", "last", "email", "phone");
+            document.contacts.CreateContact("contactId", "first", "last", "email", "phone");
         });
     </script>
 </body>
