@@ -46,11 +46,69 @@
         <uap:SplashScreen Image="images\splashscreen.png" />
 
       </uap:VisualElements>
+
+      <Extensions xmlns:uap4="http://schemas.microsoft.com/appx/manifest/uap/windows10/4">
+
+        <uap:Extension Category="windows.protocol">
+          <uap:Protocol Name="ms-contact-profile">
+            <uap:DisplayName>MyPeopleUWA</uap:DisplayName>
+          </uap:Protocol>
+        </uap:Extension>
+
+        <!-- ShareTarget -->
+        <uap:Extension Category="windows.shareTarget">
+          <uap:ShareTarget>
+            <uap:SupportedFileTypes>
+              <uap:SupportsAnyFileType />
+            </uap:SupportedFileTypes>
+            <uap:DataFormat>Text</uap:DataFormat>
+            <uap:DataFormat>Uri</uap:DataFormat>
+            <uap:DataFormat>Bitmap</uap:DataFormat>
+            <uap:DataFormat>Html</uap:DataFormat>
+            <uap:DataFormat>http://schema.org/Book</uap:DataFormat>
+          </uap:ShareTarget>
+        </uap:Extension>
+
+        <!-- To declare support for the My People contract, make the following changes to the manifest:
+             https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#declaring-support-for-the-contract-->
+        <uap4:Extension Category="windows.contactPanel" StartPage="index.html">
+
+          <!-- By default, your application will only appear in the contact panel for contacts that you have specifically annotated. 
+               This is to avoid confusion with contacts that can’t be interacted with through your app. 
+               If you want your application to appear for contacts that your application doesn’t know about 
+               (to invite users to add that contact to their account, for instance), you can add the following to your manifest.
+
+               With this change, your application will appear as an available option in the contact panel for all contacts that the user has pinned. 
+               When your application is activated using the contact panel contract, you should check to see if the contact is one your application knows about. 
+               If not, you should show your app’s new user experience.
+               https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#allow-contacts-to-invite-new-potential-users -->
+          <uap4:ContactPanel SupportsUnknownContacts="true" />
+
+        </uap4:Extension>
+
+        <!-- If you are writing an email app, you don’t need to annotate every contact manually. 
+             If you declare support for the contact pane and for the mailto: protocol, your application will automatically appear for users with an email address.
+             https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#support-for-email-apps -->
+        <uap:Extension Category="windows.protocol">
+          <uap:Protocol Name="mailto">
+            <uap:DisplayName>MyPeoplePWA Mail Extension</uap:DisplayName>
+          </uap:Protocol>
+        </uap:Extension>
+
+        <uap:Extension Category="windows.protocol">
+          <uap:Protocol Name="mypeoplepwa">
+            <uap:DisplayName>MyPeoplePWA App Extension</uap:DisplayName>
+          </uap:Protocol>
+        </uap:Extension>
+
+      </Extensions>
+
     </Application>
   </Applications>
 
   <Capabilities>
     <Capability Name="internetClient" />
+    <uap:Capability Name="contacts" />
   </Capabilities>
 
 </Package>

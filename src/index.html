@@ -17,7 +17,7 @@
         <hr />
     </div>
     <div id="container">
-        <button id="createContactButton">Create Contact</button>
+        
     </div>
 
     <!-- Include scripts at the end, for perf. -->
@@ -25,12 +25,5 @@
     <script src="js/activation.js"></script>
     <script src="js/contacts.js"></script>
     <script src="js/mypeople.js"></script>
-    <script>
-
-        var createContactButton = document.querySelector("#createContactButton");
-        createContactButton.addEventListener("click", function () {
-            document.contacts.CreateContact("contactId", "first", "last", "email", "phone");
-        });
-    </script>
 </body>
 </html>
