@@ -9,7 +9,7 @@
         // and determine if pinning on a particular surface is supported by the system your application is currently running on.
         // You can retrieve the PinnedContactManager object using the GetDefault method:
         // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#the-pinnedcontactmanager-class
-        function getPinnedContactManager () {
+        function getPinnedContactManager() {
             return Windows.ApplicationModel.Contacts.PinnedContactManager.GetDefault();
         }
 
@@ -54,7 +54,7 @@
                 annotation.SupportedOperations = contacts.ContactAnnotationOperations.contactProfile;
 
                 // Save annotation to contact annotation list
-                if (!await annotationList.TrySaveAnnotationAsync(annotation)) {
+                if (!annotationList.trySaveAnnotationAsync(annotation)) {
                     console.log("Failed to save annotation for contact to the store.");
                     return;
                 }
@@ -66,6 +66,11 @@
         // so it must be called from your Application Single - Threaded Apartment(ASTA, or UI) thread.
         // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#pinning-and-unpinning-contacts
         this.PinContact = function (contact) {
+            if (!window.Windows) {
+                console.log("MyPeople is not supported on web");
+                return;
+            }
+
             var pinnedContactManager = this.getPinnedContactManager();
             pinnedContactManager.requestPinContactAsync(contact, Windows.ApplicationModel.Contacts.PinnedContactSurface.taskbar);
         }.bind(this);
@@ -75,6 +80,11 @@
         // so it must be called from your Application Single - Threaded Apartment(ASTA, or UI) thread.
         // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#pinning-and-unpinning-contacts
         this.UnpinContact = function (contact) {
+            if (!window.Windows) {
+                console.log("MyPeople is not supported on web");
+                return;
+            }
+
             var pinnedContactManager = this.getPinnedContactManager();
             pinnedContactManager.requestUnpinContactAsync(contact, Windows.ApplicationModel.Contacts.PinnedContactSurface.taskbar);
         }.bind(this);
@@ -82,14 +92,24 @@
         // You can pin multiple contacts at the same time using the PinnedContactManager.
         // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#pinning-and-unpinning-contacts
         this.PinMultipleContacts = function (contacts) {
+            if (!window.Windows) {
+                console.log("MyPeople is not supported on web");
+                return;
+            }
+
             var pinnedContactManager = this.getPinnedContactManager();
-            pinnedContactManager.RequestPinContactsAsync(contacts, Windows.ApplicationModel.Contacts.PinnedContactSurface.taskbar);
+            pinnedContactManager.requestPinContactsAsync(contacts, Windows.ApplicationModel.Contacts.PinnedContactSurface.taskbar);
         }.bind(this);
 
         // There is currently no batch operation for unpinning contacts.
         // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#pinning-and-unpinning-contacts
         this.UnpinMultipleContacts = function (contacts) {
-            for (var i = 0; i < contacts.length; i++) {
+            if (!window.Windows) {
+                console.log("MyPeople is not supported on web");
+                return;
+            }
+
+            for(var i = 0; i < contacts.length; i++) {
                 this.UnpinContact(contact[i]);
             }
         }.bind(this);

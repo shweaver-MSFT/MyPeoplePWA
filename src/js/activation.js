@@ -76,9 +76,19 @@
 
         }.bind(this);
 
-        // 
+        // Protocol launch this app.
+        // This is useful to call when activating from a ContactPanel.
         this.LaunchSelf = function () {
-
+            var uri = new Windows.Foundation.Uri("mypeoplepwa://");
+            var options = new Windows.System.LauncherOptions();
+            Windows.System.Launcher.launchUriAsync(uri, options)
+                .then(function (success) {
+                    if (success) {
+                        // URI launched
+                    } else {
+                        // URI launch failed
+                    }
+                });
         }
     };
 

@@ -29,7 +29,7 @@
         };
 
         var activationService = document.activation;
-        console.log("activating...");
+
         if (window.Windows && window.Windows.UI && window.Windows.UI.WebUI) {
             Windows.UI.WebUI.WebUIApplication.addEventListener("activated", activationService.OnActivated);
         }
