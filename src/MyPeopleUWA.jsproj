@@ -74,6 +74,7 @@
     <Content Include="images\Wide310x150Logo.scale-200.png" />
     <Content Include="index.html" />
     <Content Include="js\activation.js" />
+    <Content Include="js\app.js" />
     <Content Include="js\contacts.js" />
     <Content Include="js\logger.js" />
     <Content Include="js\mypeople.js" />

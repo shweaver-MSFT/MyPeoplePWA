@@ -1,6 +1,7 @@
 ﻿(function () {
 
     var logger = document.logger;
+    var app = document.app;
 
     var MyPeopleService = function () {
 
@@ -23,6 +24,23 @@
             }
         }
 
+        //
+        function getAnnotationListAsync() {
+
+            return getAnnotationStoreAsync()
+                .then(function (annotationStore) {
+                    return annotationStore.findAnnotationListsAsync();
+                })
+                .then(function (annotationLists) {
+                    if (!annotationLists || annotationLists.length == 0) {
+                        return annotationStore.createAnnotationListAsync();
+                    }
+                    else {
+                        return Promise.resolve(annotationLists[0]);
+                    }
+                });
+        };
+
         // The PinnedContactManager is used to manage which contacts are pinned to the taskbar. 
         // This class lets you pin and unpin contacts, determine whether a contact is pinned, 
         // and determine if pinning on a particular surface is supported by the system your application is currently running on.
@@ -36,52 +54,29 @@
         // The annotation must contain the activatable class corresponding to your desired view in its ProviderProperties member, 
         // and declare support for the ContactProfile operation.
         // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#annotating-contacts
-        this.AnnotateContact = function (contact) {
+        this.AnnotateContactAsync = function (contact) {
 
             if (!window.Windows) {
                 logger.Log("MyPeople is not supported on web");
                 return;
             }
 
-            var apiInformation = Windows.Foundation.Metadata.ApiInformation;
-            if (apiInformation.IsApiContractPresent("Windows.Foundation.UniversalApiContract", 5)) {
+            getAnnotationListAsync()
+                .then(function (annotationList) {
 
-                var annotationList = this.GetContactAnnotationList();
-                if (null == annotationList) {
-                    return;
-                }
+                    var contacts = Windows.ApplicationModel.Contacts;
 
-                var contacts = Windows.ApplicationModel.Contacts;
+                    var annotation = new contacts.ContactAnnotation();
+                    annotation.contactId = contact.id;
+                    annotation.remoteId = contact.remoteId;
+                    annotation.supportedOperations = contacts.ContactAnnotationOperations.contactProfile | contacts.ContactAnnotationOperations.share;
 
-                // Create a new contact annotation
-                var annotation = new contacts.ContactAnnotation();
-                annotation.contactId = contact.Id;
+                    var appId = app.AppId;
+                    annotation.providerProperties.insert("ContactPanelAppID", appId);
+                    annotation.providerProperties.insert("ContactShareAppID", appId);
 
-                // Remote ID: The identifier of the user relevant for this app. When this app is
-                // launched into from the People App, this id will be provided as context on which user
-                // the operation (e.g. ContactProfile) is for.
-                annotation.RemoteId = contact.RemoteId;
-
-                // Add appId and contact panel support to the annotation
-                var appId = "MyPeoplePWA_80c4904e66sn0";
-                annotation.ProviderProperties.add("ContactPanelAppID", appId);
-
-                // The supported operations flags indicate that this app can fulfill these operations
-                // for this contact. These flags are read by apps such as the People App to create deep
-                // links back into this app. This app must also be registered for the relevant
-                // protocols in the Package.appxmanifest (in this case, ms-contact-profile).
-                annotation.SupportedOperations = contacts.ContactAnnotationOperations.contactProfile;
-
-                // Save annotation to contact annotation list
-                if (!annotationList.trySaveAnnotationAsync(annotation)) {
-                    logger.Log("Failed to save annotation for contact to the store.");
-                    return;
-                }
-            }
-        }.bind(this);
-
-        this.GetContactAnnotationListAsync = function () {
-
+                    return annotationList.trySaveAnnotationAsync(annotation);
+                });
         }.bind(this);
 
         // You can pin contacts using the PinnedContactManager. 
@@ -126,7 +121,9 @@
 
         // There is currently no batch operation for unpinning contacts.
         // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#pinning-and-unpinning-contacts
-        //this.UnpinMultipleContacts = function (contacts) { }.bind(this);
+        this.UnpinMultipleContacts = function (contacts) {
+            logger.Log("There is currently no batch operation for unpinning contacts.");
+        }.bind(this);
 
         // The ContactPanel object has two events your application should listen for:
         //

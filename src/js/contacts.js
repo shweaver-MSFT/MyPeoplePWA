@@ -21,41 +21,7 @@
             }
         }
 
-        // To allow contacts from your application to appear in the taskbar via the My People pane, 
-        // you need to write them to the Windows contact store.
-        //
-        // Your application must also write an annotation to each contact. 
-        // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#annotating-contacts
-        this.CreateContactAsync = function (firstName, lastName, email, phoneNumber) {
-
-            var contacts = Windows.ApplicationModel.Contacts;
-
-            var contact = new contacts.Contact();
-            contact.firstName = firstName;
-            contact.lastName = lastName;
-
-            //var email = new contacts.ContactEmail();
-            //email.address = email;
-            //contact.emails.add(email);
-
-            //var phone = new contacts.ContactPhone();
-            //phone.Number = phoneNumber;
-            //contact.phones.add(phone);
-
-            return this.GetContactListAsync()
-                .then(function (contactList) {
-                    return contactList.saveContactAsync(contact);
-                });
-
-        }.bind(this);
-
-        // 
-        this.DeleteContactAsync = function (contact) {
-
-        }.bind(this);
-
-        // 
-        this.GetContactListAsync = function () {
+        function getContactListAsync() {
 
             return getContactStoreAsync()
                 .then(function (contactStore) {
@@ -69,6 +35,44 @@
                         return Promise.resolve(contactLists[0]);
                     }
                 });
+        };
+
+        // To allow contacts from your application to appear in the taskbar via the My People pane, 
+        // you need to write them to the Windows contact store.
+        //
+        // Your application must also write an annotation to each contact. 
+        // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#annotating-contacts
+        this.CreateContactAsync = function (firstName, lastName, email, phoneNumber) {
+
+            var contacts = Windows.ApplicationModel.Contacts;
+
+            var contact = new contacts.Contact();
+            contact.firstName = firstName;
+            contact.lastName = lastName;
+
+            // Use a unique value as the remoteId that we can key on later
+            contact.remoteId = email;
+
+            //var email = new contacts.ContactEmail();
+            //email.address = email;
+            //contact.emails.add(email);
+
+            //var phone = new contacts.ContactPhone();
+            //phone.Number = phoneNumber;
+            //contact.phones.add(phone);
+
+            return getContactListAsync()
+                .then(function (contactList) {
+                    return contactList.saveContactAsync(contact);
+                })
+                .then(function () {
+                    return Promise.resolve(contact);
+                });
+
+        }.bind(this);
+
+        // 
+        this.DeleteContactAsync = function (contact) {
 
         }.bind(this);
     };

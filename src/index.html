@@ -100,7 +100,7 @@
 
         <!-- New or Edit Current Contact Panel -->
         <div id="currentContactPanel">
-            
+
         </div>
 
         <!-- Contact Commands Panel -->
@@ -170,6 +170,7 @@
 
     <!-- Include scripts at the end, for perf. -->
     <script src="js/logger.js"></script>
+    <script src="js/app.js"></script>
     <script src="js/activation.js"></script>
     <script src="js/contacts.js"></script>
     <script src="js/mypeople.js"></script>
@@ -185,24 +186,49 @@
 
                 this.Contacts = [];
 
-                this.CreateNewContact = function (first, last, email, phone) {
-                    contacts.CreateContactAsync(first, last, email, phone);
+                this.CreateNewContactAsync = function (first, last, email, phone) {
+                    contacts.CreateContactAsync(first, last, email, phone)
+                        .then(function (contact) {
+                            return myPeople.AnnotateContactAsync(contact);
+                        })
+                        .then(function (e) {
+                            logger.Log("New Contact Created and Annotated");
+                            this.Contacts.push(contact);
+                            return Promise.resolve();
+                        });
                 };
 
-                this.DeleteContact = function () {
-                    contacts.DeleteContact("id")
+                this.DeleteContactAsync = function (contact) {
+                    contacts.DeleteContactAsync(contact)
+                        .then(function () {
+                            logger.Log("Contact Deleted");
+                            this.Contacts.remove(contact);
+                            return Promise.resolve();
+                        });
                 };
 
-                this.PinContact = function () {
-
+                this.PinContactAsync = function (contact) {
+                    return myPeople.PinContactAsync(contact)
+                        .then(function () {
+                            logger.Log("Contact Pinned to Taskbar");
+                            return Promise.resolve();
+                        });
                 };
 
-                this.UnpinContact = function () {
-
+                this.UnpinContactAsync = function () {
+                    return myPeople.UnpinContactAsync(contact)
+                        .then(function () {
+                            logger.Log("Contact Unpinned from Taskbar");
+                            return Promise.resolve();
+                        });
                 };
 
-                this.PinMultipleContacts = function () {
-
+                this.PinMultipleContactsAsync = function (contacts) {
+                    return myPeople.PinMultipleContactsAsync(contacts)
+                        .then(function () {
+                            logger.Log("Contacts Pinned to Taskbar");
+                            return Promise.resolve();
+                        });
                 };
             };
 
@@ -213,18 +239,23 @@
             var currentContactPanel = contentRoot.querySelector("#currentContactPanel");
             var newContactButton = contentRoot.querySelector("#newContactButton");
             var pinSelectedButton = contentRoot.querySelector("#pinSelectedButton");
-            var unpinSelectedButton = contentRoot.querySelector("#unpinSelectedButton");
-            var deleteSelectedButton = contentRoot.querySelector("#deleteSelectedButton");
             var selectAllButton = contentRoot.querySelector("#selectAllButton");
             var deselectAllButton = contentRoot.querySelector("#deselectAllButton");
 
+            // *Edit Template buttons
+            //var unpinContactButton = contentRoot.querySelector("#unpinSelectedButton");
+            //var deleteContactButton = contentRoot.querySelector("#deleteSelectedButton");
+
+            var selectedContacts = [];
+
+            // 
             newContactButton.addEventListener("click", function (e) {
 
                 // Clear out the currentContact
                 currentContactPanel.innerHTML = "";
 
                 // Clone the template so we don't affect the original one
-                var contactDetailsTemplate = templates.querySelector("#contactDetailsTemplate").cloneNode(true); 
+                var contactDetailsTemplate = templates.querySelector("#contactDetailsTemplate").cloneNode(true);
 
                 // Update the template values
                 var newOrEditIndicator = contactDetailsTemplate.querySelector("#newOrEditIndicator");
@@ -238,31 +269,47 @@
                     var email = currentContactPanel.querySelector("#contactEmail input").value;
                     var phone = currentContactPanel.querySelector("#contactPhone input").value;
 
-                    viewModel.CreateNewContact(first, last, email, phone);
+                    viewModel.CreateNewContactAsync(first, last, email, phone);
                 };
 
                 // Add the updated template to the currentContactPanel
                 currentContactPanel.appendChild(contactDetailsTemplate);
             });
 
+            // 
             pinSelectedButton.addEventListener("click", function (e) {
+                var contacts = []; // Get selected contacts from page
 
+                viewModel.PinMultipleContactsAsync(contacts)
+                    .then(function () {
+
+                    });
             });
 
-            unpinSelectedButton.addEventListener("click", function (e) {
+            // 
+            deleteContactButton.addEventListener("click", function (e) {
 
+                var contact = null;
+
+                viewModel.DeleteContactAsync(contact)
+                    .then(function () {
+
+                    });
             });
 
-            deleteSelectedButton.addEventListener("click", function (e) {
-
-            });
-
+            // 
             selectAllButton.addEventListener("click", function (e) {
 
+                var contacts = [];
+
+                // Add all contacts to selectedContacts
+                
             });
 
+            // 
             deselectAllButton.addEventListener("click", function (e) {
-
+                // Remove all contacts from selectedContacts
+                selectedContacts = [];
             });
         })();
     </script>
