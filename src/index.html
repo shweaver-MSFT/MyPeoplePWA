@@ -9,15 +9,163 @@
     <title>MyPeople PWA</title>
 
     <link href="css/global.css" rel="stylesheet">
+
+    <style>
+        #contentRoot {
+            font-family: 'Segoe UI';
+            width: 100%;
+            height: 100%;
+            text-align: center;
+        }
+
+        #headerPanel {
+            position: absolute;
+            left: 12px;
+            top: 12px;
+            font-size: 20pt;
+        }
+
+        /* New or Edit Current Contact Panel */
+        #currentContactPanel {
+            height: 300px;
+            display: inline-block;
+            text-align: left;
+        }
+
+            #currentContactPanel #contentWrapper {
+                border: 1px solid black;
+            }
+
+            #currentContactPanel #newOrEditIndicator {
+                width: 100%;
+            }
+
+            #currentContactPanel #contactPicPanel {
+                display: inline-block;
+                width: 100px;
+                height: 100px;
+            }
+
+            #currentContactPanel #contactDetailsPanel {
+                display: inline-block;
+            }
+
+                #currentContactPanel #contactDetailsPanel #contactName div {
+                    display: inline-block;
+                }
+
+        /* Contact Commands Panel */
+        #contactCommandsPanel {
+            display: inline-block;
+            width: 90vw;
+            text-align: center;
+        }
+
+            #contactCommandsPanel div {
+                display: inline-block;
+            }
+
+            #contactCommandsPanel #contactOptionsPanel {
+                float: left;
+            }
+
+            #contactCommandsPanel #contactSelectionOptionsPanel {
+            }
+
+            #contactCommandsPanel #contactCollectionOptionsPanel {
+                float: right;
+            }
+
+        /* Contact Collection Panel */
+        #contactCollectionPanel {
+            width: 90vw;
+            height: auto;
+        }
+
+            #contactCollectionPanel #contactCollectionEmptyState {
+                
+            }
+
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
-    <div>
-        <h1>MyPeople PWA</h1>
+    <div id="contentRoot">
+        <div id="headerPanel">
+            My People JS
+        </div>
+
+        <!-- New or Edit Current Contact Panel -->
+        <div id="currentContactPanel">
+            
+        </div>
+
+        <!-- Contact Commands Panel -->
+        <div id="contactCommandsPanel">
+            <div id="contactOptionsPanel">
+                <button id="newContactButton">New Contact</button>
+            </div>
+            <div id="contactSelectionOptionsPanel">
+                <button id="pinSelectedButton" disabled>Pin Contact(s)</button>
+                <button id="unpinSelectedButton" disabled>Unpin Contact(s)</button>
+                <button id="deleteSelectedButton" disabled>Delete Contact(s)</button>
+            </div>
+            <div id="contactCollectionOptionsPanel">
+                <button id="selectAllButton">Select All</button>
+                <button id="deselectAllButton" disabled>Deselect All</button>
+            </div>
+        </div>
+
         <hr />
+
+        <!-- Contact Collection Panel -->
+        <div id="contactCollectionPanel">
+            <div id="contactCollectionEmptyState">You have no contacts yet. Try creating a new one!</div>
+            <div id="contactCollectionContent">
+
+            </div>
+        </div>
     </div>
-    <div id="container">
-        
+
+    <div id="templates" style="display: none;">
+
+        <!-- Contact Details Template (for add/edit contact) -->
+        <div id="contactDetailsTemplate">
+            <div id="newOrEditIndicator"></div>
+            <div id="contentWrapper">
+                <div id="contactPicPanel">
+                    <img id="contactPic" src="images/Contact.png" />
+                </div>
+                <div id="contactDetailsPanel">
+                    <div id="contactName">
+                        <div id="contactFirstName">
+                            <input type="text" placeholder="First" />
+                        </div>
+                        <div id="contactLastName">
+                            <input type="text" placeholder="Last" />
+                        </div>
+                    </div>
+                    <div id="contactPhone">
+                        <input type="text" placeholder="Phone #" />
+                    </div>
+                    <div id="contactEmail">
+                        <input type="text" placeholder="Email" />
+                    </div>
+                </div>
+            </div>
+            <button id="createContactButton">Create Contact</button>
+        </div>
+
+        <!-- Contact Template (for contacts collection) -->
+        <div id="contactTemplate">
+            <div id="contactPicPanel">
+                <img id="contactPic" src="images/Contact.png" />
+            </div>
+            <div id="contactName"></div>
+        </div>
     </div>
 
     <!-- Include scripts at the end, for perf. -->
@@ -25,5 +173,98 @@
     <script src="js/activation.js"></script>
     <script src="js/contacts.js"></script>
     <script src="js/mypeople.js"></script>
+    <script>
+        (function () {
+
+            /* Main ViewModel */
+            viewModel = new function () {
+
+                var contacts = document.contacts;
+                var myPeople = document.myPeople;
+                var logger = document.logger;
+
+                this.Contacts = [];
+
+                this.CreateNewContact = function (first, last, email, phone) {
+                    contacts.CreateContactAsync(first, last, email, phone);
+                };
+
+                this.DeleteContact = function () {
+                    contacts.DeleteContact("id")
+                };
+
+                this.PinContact = function () {
+
+                };
+
+                this.UnpinContact = function () {
+
+                };
+
+                this.PinMultipleContacts = function () {
+
+                };
+            };
+
+            /* Main View */
+            var contentRoot = document.querySelector("#contentRoot");
+            var templates = document.querySelector("#templates");
+
+            var currentContactPanel = contentRoot.querySelector("#currentContactPanel");
+            var newContactButton = contentRoot.querySelector("#newContactButton");
+            var pinSelectedButton = contentRoot.querySelector("#pinSelectedButton");
+            var unpinSelectedButton = contentRoot.querySelector("#unpinSelectedButton");
+            var deleteSelectedButton = contentRoot.querySelector("#deleteSelectedButton");
+            var selectAllButton = contentRoot.querySelector("#selectAllButton");
+            var deselectAllButton = contentRoot.querySelector("#deselectAllButton");
+
+            newContactButton.addEventListener("click", function (e) {
+
+                // Clear out the currentContact
+                currentContactPanel.innerHTML = "";
+
+                // Clone the template so we don't affect the original one
+                var contactDetailsTemplate = templates.querySelector("#contactDetailsTemplate").cloneNode(true); 
+
+                // Update the template values
+                var newOrEditIndicator = contactDetailsTemplate.querySelector("#newOrEditIndicator");
+                newOrEditIndicator.textContent = "*NEW";
+
+                // Wire up the createContact button
+                var createContactButton = contactDetailsTemplate.querySelector("#createContactButton");
+                createContactButton.onclick = function (e) {
+                    var first = currentContactPanel.querySelector("#contactFirstName input").value;
+                    var last = currentContactPanel.querySelector("#contactLastName input").value;
+                    var email = currentContactPanel.querySelector("#contactEmail input").value;
+                    var phone = currentContactPanel.querySelector("#contactPhone input").value;
+
+                    viewModel.CreateNewContact(first, last, email, phone);
+                };
+
+                // Add the updated template to the currentContactPanel
+                currentContactPanel.appendChild(contactDetailsTemplate);
+            });
+
+            pinSelectedButton.addEventListener("click", function (e) {
+
+            });
+
+            unpinSelectedButton.addEventListener("click", function (e) {
+
+            });
+
+            deleteSelectedButton.addEventListener("click", function (e) {
+
+            });
+
+            selectAllButton.addEventListener("click", function (e) {
+
+            });
+
+            deselectAllButton.addEventListener("click", function (e) {
+
+            });
+        })();
+    </script>
 </body>
 </html>

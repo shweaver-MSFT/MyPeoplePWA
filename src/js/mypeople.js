@@ -4,7 +4,24 @@
 
     var MyPeopleService = function () {
 
-        var registeredContactPanel;
+        var registeredContactPanel = null;
+        var annotationStore = null;
+
+        // 
+        function getAnnotationStoreAsync() {
+            var contacts = Windows.ApplicationModel.Contacts;
+
+            if (annotationStore == null) {
+                return contacts.ContactManager.requestAnnotationStoreAsync(contacts.ContactAnnotationStoreAccessType.appAnnotationsReadWrite)
+                    .then(function (e) {
+                        annotationStore = e;
+                        return annotationStore;
+                    });
+            }
+            else {
+                return Promise.resolve(annotationStore);
+            }
+        }
 
         // The PinnedContactManager is used to manage which contacts are pinned to the taskbar. 
         // This class lets you pin and unpin contacts, determine whether a contact is pinned, 
@@ -29,7 +46,7 @@
             var apiInformation = Windows.Foundation.Metadata.ApiInformation;
             if (apiInformation.IsApiContractPresent("Windows.Foundation.UniversalApiContract", 5)) {
 
-                var annotationList = document.contacts.GetContactAnnotationList();
+                var annotationList = this.GetContactAnnotationList();
                 if (null == annotationList) {
                     return;
                 }
@@ -61,6 +78,10 @@
                     return;
                 }
             }
+        }.bind(this);
+
+        this.GetContactAnnotationListAsync = function () {
+
         }.bind(this);
 
         // You can pin contacts using the PinnedContactManager. 
@@ -105,16 +126,7 @@
 
         // There is currently no batch operation for unpinning contacts.
         // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#pinning-and-unpinning-contacts
-        this.UnpinMultipleContacts = function (contacts) {
-            if (!window.Windows) {
-                logger.Log("MyPeople is not supported on web");
-                return;
-            }
-
-            for(var i = 0; i < contacts.length; i++) {
-                this.UnpinContact(contact[i]);
-            }
-        }.bind(this);
+        //this.UnpinMultipleContacts = function (contacts) { }.bind(this);
 
         // The ContactPanel object has two events your application should listen for:
         //
