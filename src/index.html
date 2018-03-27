@@ -137,7 +137,7 @@
             <div id="newOrEditIndicator"></div>
             <div id="contentWrapper">
                 <div id="contactPicPanel">
-                    <img id="contactPic" src="ms-appx://images/Contact.png" />
+                    <img id="contactPic" src="images/Contact.png" />
                 </div>
                 <div id="contactDetailsPanel">
                     <div id="contactName">
@@ -147,9 +147,6 @@
                         <div id="contactLastName">
                             <input type="text" placeholder="Last" />
                         </div>
-                    </div>
-                    <div id="contactPhone">
-                        <input type="text" placeholder="Phone #" />
                     </div>
                     <div id="contactEmail">
                         <input type="text" placeholder="Email" />
@@ -185,20 +182,19 @@
                 var logger = document.logger;
 
                 this.Contacts = [];
+                this.CurrentContact = null;
 
-                this.CreateNewContactAsync = function (first, last, email, phone) {
-
-                    var contactTemp = null;
-                    return contacts.CreateContactAsync(first, last, email, phone)
+                this.CreateNewContactAsync = function (first, last, email) {
+                    return contacts.CreateContactAsync(first, last, email)
                         .then(function (contact) {
-                            contactTemp = contact;
+                            this.CurrentContact = contact;
                             this.Contacts.push(contact);
                             return myPeople.AnnotateContactAsync(contact);
                         }.bind(this))
                         .then(function (annotation) {
                             logger.Log("New Contact Created and Annotated");
-                            return Promise.resolve(contactTemp);
-                        });
+                            return Promise.resolve(this.CurrentContact);
+                        }.bind(this));
                 }.bind(this);
 
                 this.DeleteContactAsync = function (contact) {
@@ -249,11 +245,104 @@
             var contactCollectionPanel = contentRoot.querySelector("#contactCollectionPanel");
             var contactCollectionContent = contactCollectionPanel.querySelector("#contactCollectionContent");
 
-            // *Edit Template buttons
-            //var unpinContactButton = contentRoot.querySelector("#unpinSelectedButton");
-            //var deleteContactButton = contentRoot.querySelector("#deleteSelectedButton");
-
             var selectedContacts = [];
+
+            //
+            function setContactSelected(contact, isSelected) {
+
+                var template = contactCollectionContent.querySelector("[data-contact-id='" + contact.id + "']");
+
+                if (template) {
+                    if (isSelected == true) {
+                        var i = selectedContacts.indexOf(contact);
+                        if (i != -1) {
+                            selectedContacts.splice(i, 1);
+                        }
+                        template.style.backgroundColor = "blue";
+                    }
+                    else {
+                        selectedContacts.push(contact);
+                        template.style.backgroundColor = "white";
+                    }
+                }
+            }
+
+            //
+            function onUpdateContactButtonClick(e) {
+
+            }
+
+            //
+            function onContactClick(e) {
+
+                // Contact bound during onCreateContactButtonClick
+                var currentContact = this.contact;
+
+                // Update the contact selection status
+                setContactSelected(currentContact, selectedContacts.indexOf(currentContact) >= 0);
+
+                // Clear out the currentContact
+                currentContactPanel.innerHTML = "";
+
+                // Clone the template so we don't affect the original one
+                var contactDetailsTemplate = templates.querySelector("#contactDetailsTemplate").cloneNode(true);
+
+                // Update the template values
+                var newOrEditIndicator = contactDetailsTemplate.querySelector("#newOrEditIndicator");
+                newOrEditIndicator.textContent = "*EDIT";
+
+                contactDetailsTemplate.querySelector("#contactFirstName input").value = currentContact.firstName;
+                contactDetailsTemplate.querySelector("#contactLastName input").value = currentContact.lastName;
+                contactDetailsTemplate.querySelector("#contactEmail input").value = currentContact.address;
+
+                // Wire up the Update Contact button
+                var createContactButton = contactDetailsTemplate.querySelector("#createContactButton");
+                createContactButton.textContent = "Update Contact";
+                createContactButton.onclick = onUpdateContactButtonClick.bind({ "contact": currentContact });;
+
+                // Wire up additional edit buttons
+                //var unpinContactButton = contactDetailsTemplate.querySelector("#unpinSelectedButton");
+                //var deleteContactButton = contactDetailsTemplate.querySelector("#deleteSelectedButton");
+
+                // Add the updated template to the currentContactPanel
+                currentContactPanel.appendChild(contactDetailsTemplate);
+            }
+
+            //
+            function onCreateContactButtonClick(e) {
+
+                var first = currentContactPanel.querySelector("#contactFirstName input").value;
+                var last = currentContactPanel.querySelector("#contactLastName input").value;
+                var email = currentContactPanel.querySelector("#contactEmail input").value;
+
+                // Create the new contact
+                viewModel.CreateNewContactAsync(first, last, email)
+                    .then(function (contact) {
+
+                        // Add the new contact to the UI
+                        var contactTemplate = templates.querySelector("#contactTemplate").cloneNode(true);
+
+                        // Update the template values
+                        var contactName = contactTemplate.querySelector("#contactName");
+                        contactName.innerHTML = first + ' ' + last;
+
+                        contactTemplate.setAttribute("data-contact-id", contact.id);
+
+                        // Wire up selection interaction
+                        // Bind the contact to the function for easy retrieval
+                        contactTemplate.onclick = onContactClick.bind({ "contact": contact });
+
+                        // Add the template to the UI
+                        contactCollectionContent.appendChild(contactTemplate);
+
+                        // Hide the empty state
+                        contactCollectionEmptyState.classList.add("hidden");
+
+                        // 
+                        contactTemplate.onclick();
+                    });
+            }
+
 
             // 
             newContactButton.addEventListener("click", function (e) {
@@ -270,35 +359,7 @@
 
                 // Wire up the createContact button
                 var createContactButton = contactDetailsTemplate.querySelector("#createContactButton");
-                createContactButton.onclick = function (e) {
-                    var first = currentContactPanel.querySelector("#contactFirstName input").value;
-                    var last = currentContactPanel.querySelector("#contactLastName input").value;
-                    var email = currentContactPanel.querySelector("#contactEmail input").value;
-                    var phone = currentContactPanel.querySelector("#contactPhone input").value;
-
-                    // Create the new contact
-                    viewModel.CreateNewContactAsync(first, last, email, phone)
-                        .then(function (contact) {
-
-                            // Add the new contact to the UI
-                            var contactTemplate = templates.querySelector("#contactTemplate").cloneNode(true);
-
-                            // Update the template values
-                            var contactName = contactTemplate.querySelector("#contactName");
-                            contactName.innerHTML = first + ' ' + last;
-
-                            // Wire up selection interaction
-                            contactTemplate.onclick = function () {
-
-                            };
-
-                            // Add the template to the UI
-                            contactCollectionContent.appendChild(contactTemplate);
-
-                            // Hide the empty state
-                            contactCollectionEmptyState.classList.add("hidden");
-                        });
-                };
+                createContactButton.onclick = onCreateContactButtonClick;
 
                 // Add the updated template to the currentContactPanel
                 currentContactPanel.appendChild(contactDetailsTemplate);

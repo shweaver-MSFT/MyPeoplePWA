@@ -42,7 +42,7 @@
         //
         // Your application must also write an annotation to each contact. 
         // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#annotating-contacts
-        this.CreateContactAsync = function (firstName, lastName, email, phoneNumber) {
+        this.CreateContactAsync = function (firstName, lastName, email) {
 
             var contacts = Windows.ApplicationModel.Contacts;
 
@@ -56,10 +56,6 @@
             //var email = new contacts.ContactEmail();
             //email.address = email;
             //contact.emails.add(email);
-
-            //var phone = new contacts.ContactPhone();
-            //phone.Number = phoneNumber;
-            //contact.phones.add(phone);
 
             return getContactListAsync()
                 .then(function (contactList) {
