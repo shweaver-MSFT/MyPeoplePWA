@@ -75,7 +75,10 @@
                     annotation.providerProperties.insert("ContactPanelAppID", appId);
                     annotation.providerProperties.insert("ContactShareAppID", appId);
 
-                    return annotationList.trySaveAnnotationAsync(annotation);
+                    return annotationList.trySaveAnnotationAsync(annotation)
+                        .then(function () {
+                            return Promise.resolve(annotation);
+                        });
                 });
         }.bind(this);
 

@@ -137,7 +137,7 @@
             <div id="newOrEditIndicator"></div>
             <div id="contentWrapper">
                 <div id="contactPicPanel">
-                    <img id="contactPic" src="images/Contact.png" />
+                    <img id="contactPic" src="ms-appx://images/Contact.png" />
                 </div>
                 <div id="contactDetailsPanel">
                     <div id="contactName">
@@ -187,25 +187,28 @@
                 this.Contacts = [];
 
                 this.CreateNewContactAsync = function (first, last, email, phone) {
-                    contacts.CreateContactAsync(first, last, email, phone)
+
+                    var contactTemp = null;
+                    return contacts.CreateContactAsync(first, last, email, phone)
                         .then(function (contact) {
-                            return myPeople.AnnotateContactAsync(contact);
-                        })
-                        .then(function (e) {
-                            logger.Log("New Contact Created and Annotated");
+                            contactTemp = contact;
                             this.Contacts.push(contact);
-                            return Promise.resolve();
+                            return myPeople.AnnotateContactAsync(contact);
+                        }.bind(this))
+                        .then(function (annotation) {
+                            logger.Log("New Contact Created and Annotated");
+                            return Promise.resolve(contactTemp);
                         });
-                };
+                }.bind(this);
 
                 this.DeleteContactAsync = function (contact) {
-                    contacts.DeleteContactAsync(contact)
+                    return contacts.DeleteContactAsync(contact)
                         .then(function () {
                             logger.Log("Contact Deleted");
                             this.Contacts.remove(contact);
                             return Promise.resolve();
                         });
-                };
+                }.bind(this);
 
                 this.PinContactAsync = function (contact) {
                     return myPeople.PinContactAsync(contact)
@@ -213,7 +216,7 @@
                             logger.Log("Contact Pinned to Taskbar");
                             return Promise.resolve();
                         });
-                };
+                }.bind(this);
 
                 this.UnpinContactAsync = function () {
                     return myPeople.UnpinContactAsync(contact)
@@ -221,7 +224,7 @@
                             logger.Log("Contact Unpinned from Taskbar");
                             return Promise.resolve();
                         });
-                };
+                }.bind(this);
 
                 this.PinMultipleContactsAsync = function (contacts) {
                     return myPeople.PinMultipleContactsAsync(contacts)
@@ -229,18 +232,22 @@
                             logger.Log("Contacts Pinned to Taskbar");
                             return Promise.resolve();
                         });
-                };
+                }.bind(this);
             };
 
             /* Main View */
             var contentRoot = document.querySelector("#contentRoot");
             var templates = document.querySelector("#templates");
 
-            var currentContactPanel = contentRoot.querySelector("#currentContactPanel");
+            var currentContactPanel = contentRoot.querySelector("#currentContactPanel"); 
+
             var newContactButton = contentRoot.querySelector("#newContactButton");
             var pinSelectedButton = contentRoot.querySelector("#pinSelectedButton");
             var selectAllButton = contentRoot.querySelector("#selectAllButton");
             var deselectAllButton = contentRoot.querySelector("#deselectAllButton");
+
+            var contactCollectionPanel = contentRoot.querySelector("#contactCollectionPanel");
+            var contactCollectionContent = contactCollectionPanel.querySelector("#contactCollectionContent");
 
             // *Edit Template buttons
             //var unpinContactButton = contentRoot.querySelector("#unpinSelectedButton");
@@ -269,7 +276,28 @@
                     var email = currentContactPanel.querySelector("#contactEmail input").value;
                     var phone = currentContactPanel.querySelector("#contactPhone input").value;
 
-                    viewModel.CreateNewContactAsync(first, last, email, phone);
+                    // Create the new contact
+                    viewModel.CreateNewContactAsync(first, last, email, phone)
+                        .then(function (contact) {
+
+                            // Add the new contact to the UI
+                            var contactTemplate = templates.querySelector("#contactTemplate").cloneNode(true);
+
+                            // Update the template values
+                            var contactName = contactTemplate.querySelector("#contactName");
+                            contactName.innerHTML = first + ' ' + last;
+
+                            // Wire up selection interaction
+                            contactTemplate.onclick = function () {
+
+                            };
+
+                            // Add the template to the UI
+                            contactCollectionContent.appendChild(contactTemplate);
+
+                            // Hide the empty state
+                            contactCollectionEmptyState.classList.add("hidden");
+                        });
                 };
 
                 // Add the updated template to the currentContactPanel
@@ -287,15 +315,15 @@
             });
 
             // 
-            deleteContactButton.addEventListener("click", function (e) {
+            //deleteContactButton.addEventListener("click", function (e) {
 
-                var contact = null;
+            //    var contact = null;
 
-                viewModel.DeleteContactAsync(contact)
-                    .then(function () {
+            //    viewModel.DeleteContactAsync(contact)
+            //        .then(function () {
 
-                    });
-            });
+            //        });
+            //});
 
             // 
             selectAllButton.addEventListener("click", function (e) {
