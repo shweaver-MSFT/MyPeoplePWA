@@ -19,9 +19,7 @@
         </div>
 
         <!-- New or Edit Current Contact Panel -->
-        <div id="currentContactPanel">
-
-        </div>
+        <div id="currentContactPanel"></div>
 
         <!-- Contact Commands Panel -->
         <div id="contactCommandsPanel">
@@ -48,9 +46,9 @@
 
     <div id="templates" style="display: none;">
 
-        <!-- Contact Details Template (for add/edit contact) -->
-        <div id="contactDetailsTemplate">
-            <div id="newOrEditIndicator"></div>
+        <!-- Create Contact Template -->
+        <div id="createContactTemplate">
+            <div id="newOrEditIndicator">*NEW</div>
             <div id="contentWrapper">
                 <div id="contactPicPanel">
                     <img id="contactPic" src="images/Contact.png" />
@@ -70,10 +68,32 @@
                 </div>
             </div>
             <button id="createContactButton">Create Contact</button>
-            <button id="updateContactButton" class="hidden">Update Contact</button>
-            <button id="pinContactButton" class="hidden">Pin Contact</button>
-            <button id="unpinContactButton" class="hidden">Unpin Contact</button>
-            <button id="deleteContactButton" class="hidden">Delete Contact</button>
+        </div>
+
+        <!-- Edit Contact Template -->
+        <div id="editContactTemplate">
+            <div id="newOrEditIndicator">*EDIT</div>
+            <div id="contentWrapper">
+                <div id="contactPicPanel">
+                    <img id="contactPic" src="images/Contact.png" />
+                </div>
+                <div id="contactDetailsPanel">
+                    <div id="contactName">
+                        <div id="contactFirstName">
+                            <input type="text" placeholder="First" disabled />
+                        </div>
+                        <div id="contactLastName">
+                            <input type="text" placeholder="Last" disabled />
+                        </div>
+                    </div>
+                    <div id="contactEmail">
+                        <input type="text" placeholder="Email" disabled />
+                    </div>
+                </div>
+            </div>
+            <button id="pinContactButton">Pin Contact</button>
+            <button id="unpinContactButton">Unpin Contact</button>
+            <button id="deleteContactButton">Delete Contact</button>
         </div>
 
         <!-- Contact Template (for contacts collection) -->
@@ -167,7 +187,7 @@
                 }.bind(this);
 
                 this.UpdateContactAsync = function (contact) {
-                    return contacts.UpdateContactsAsync(contacts)
+                    return contacts.UpdateContactAsync(contacts)
                         .then(function () {
                             logger.Log("Contacts Pinned to Taskbar");
                             return Promise.resolve();
@@ -279,19 +299,6 @@
              * 
              * @param e
              */
-            function onUpdateContactButtonClick(e) {
-                var contact = this.contact;
-
-                viewModel.UpdateContactAsync(contact)
-                    .then(function () {
-
-                    });
-            }
-
-            /**
-             * 
-             * @param e
-             */
             function onPinContactButtonClick(e) {
                 var contact = this.contact;
 
@@ -325,7 +332,6 @@
                     .then(function () {
                         removeContact(contact);
                         currentContactPanel.innerHTML = "";
-                        updateSelectionButtons();
                     });
             }
 
@@ -341,42 +347,28 @@
                 currentContactPanel.innerHTML = "";
 
                 // Clone the template so we don't affect the original one
-                var contactDetailsTemplate = templates.querySelector("#contactDetailsTemplate").cloneNode(true);
+                var editContactTemplate = templates.querySelector("#editContactTemplate").cloneNode(true);
 
-                // Update the template values
-                var newOrEditIndicator = contactDetailsTemplate.querySelector("#newOrEditIndicator");
-                newOrEditIndicator.textContent = "*EDIT";
+                editContactTemplate.querySelector("#contactFirstName input").value = currentContact.firstName;
+                editContactTemplate.querySelector("#contactLastName input").value = currentContact.lastName;
+                editContactTemplate.querySelector("#contactEmail input").value = currentContact.remoteId;
 
-                contactDetailsTemplate.querySelector("#contactFirstName input").value = currentContact.firstName;
-                contactDetailsTemplate.querySelector("#contactLastName input").value = currentContact.lastName;
-                contactDetailsTemplate.querySelector("#contactEmail input").value = currentContact.remoteId;
-
-                // Wire up the Update Contact button
-                contactDetailsTemplate.querySelector("#createContactButton").classList.add("hidden");
-
-                var updateContactButton = contactDetailsTemplate.querySelector("#updateContactButton");
-                updateContactButton.classList.remove("hidden");
-                updateContactButton.onclick = onUpdateContactButtonClick.bind({ "contact": currentContact });;
-
-                // Wire up additional edit buttons
+                // Show and wire up additional edit buttons
                 var isPinned = viewModel.IsContactPinned(currentContact);
 
-                var pinContactButton = contactDetailsTemplate.querySelector("#pinContactButton");
-                pinContactButton.classList.remove("hidden");
+                var pinContactButton = editContactTemplate.querySelector("#pinContactButton");
                 pinContactButton.disabled = isPinned;
                 pinContactButton.onclick = onPinContactButtonClick.bind({ 'contact': currentContact });
 
-                var unpinContactButton = contactDetailsTemplate.querySelector("#unpinContactButton");
-                unpinContactButton.classList.remove("hidden");
+                var unpinContactButton = editContactTemplate.querySelector("#unpinContactButton");
                 unpinContactButton.disabled = !isPinned;
                 unpinContactButton.onclick = onUnpinContactButtonClick.bind({ 'contact': currentContact });
 
-                var deleteContactButton = contactDetailsTemplate.querySelector("#deleteContactButton");
-                deleteContactButton.classList.remove("hidden");
+                var deleteContactButton = editContactTemplate.querySelector("#deleteContactButton");
                 deleteContactButton.onclick = onDeleteContactButtonClick.bind({ 'contact': currentContact });
 
                 // Add the updated template to the currentContactPanel
-                currentContactPanel.appendChild(contactDetailsTemplate);
+                currentContactPanel.appendChild(editContactTemplate);
             }
 
             /**
@@ -409,6 +401,7 @@
              * @param contact
              */
             function removeContact(contact) {
+                setContactSelected(contact, false);
                 var template = contactCollectionContent.querySelector("[data-contact-id='" + contact.id + "']");
                 template.remove();
             }
@@ -461,13 +454,13 @@
                 }
 
                 // Validate the email a bit. This helps ensure that when creating new contacts they have a usable email to test sharing with.
-                var re = new RegExp("[a - z0 - 9!#$ %& '*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&' * +/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?");
+                var re = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
                 if (re.test(email.value.toLowerCase())) {
-                    email.classList.add("error");
-                    isError = true;
+                    email.classList.remove("error");
                 }
                 else {
-                    email.classList.remove("error");
+                    email.classList.add("error");
+                    isError = true;
                 }
 
                 if (isError) return;
@@ -491,18 +484,14 @@
                 currentContactPanel.innerHTML = "";
 
                 // Clone the template so we don't affect the original one
-                var contactDetailsTemplate = templates.querySelector("#contactDetailsTemplate").cloneNode(true);
-
-                // Update the template values
-                var newOrEditIndicator = contactDetailsTemplate.querySelector("#newOrEditIndicator");
-                newOrEditIndicator.textContent = "*NEW";
+                var createContactTemplate = templates.querySelector("#createContactTemplate").cloneNode(true);
 
                 // Wire up the createContact button
-                var createContactButton = contactDetailsTemplate.querySelector("#createContactButton");
+                var createContactButton = createContactTemplate.querySelector("#createContactButton");
                 createContactButton.onclick = onCreateContactButtonClick;
 
                 // Add the updated template to the currentContactPanel
-                currentContactPanel.appendChild(contactDetailsTemplate);
+                currentContactPanel.appendChild(createContactTemplate);
 
                 setContactFocused(null);
             });

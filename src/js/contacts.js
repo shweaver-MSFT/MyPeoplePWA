@@ -37,6 +37,7 @@
                 });
         };
 
+        //
         this.GetContactsAsync = function () {
             return getContactListAsync()
                 .then(function (contactList) {
@@ -67,13 +68,10 @@
             return getContactListAsync()
                 .then(function onSuccess(contactList) {
                     return contactList.saveContactAsync(contact);
-                }, function onError(e) {
-                    logger.Log("Failed to create new contact");
                 })
                 .then(function () {
                     return Promise.resolve(contact);
                 });
-
         }.bind(this);
 
         // 
