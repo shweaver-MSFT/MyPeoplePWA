@@ -8,7 +8,9 @@
         var registeredContactPanel = null;
         var annotationStore = null;
 
-        // 
+        /**
+         * 
+         */
         function getAnnotationStoreAsync() {
             var contacts = Windows.ApplicationModel.Contacts;
 
@@ -24,7 +26,9 @@
             }
         }
 
-        //
+        /**
+         * 
+         */
         function getAnnotationListAsync() {
 
             return getAnnotationStoreAsync()
@@ -47,7 +51,7 @@
         // You can retrieve the PinnedContactManager object using the GetDefault method:
         // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#the-pinnedcontactmanager-class
         function getPinnedContactManager() {
-            return Windows.ApplicationModel.Contacts.PinnedContactManager.GetDefault();
+            return Windows.ApplicationModel.Contacts.PinnedContactManager.getDefault();
         }
 
         // Annotations are pieces of data from your application that are associated with a contact. 
@@ -92,7 +96,7 @@
                 return;
             }
 
-            var pinnedContactManager = this.getPinnedContactManager();
+            var pinnedContactManager = getPinnedContactManager();
             pinnedContactManager.requestPinContactAsync(contact, Windows.ApplicationModel.Contacts.PinnedContactSurface.taskbar);
         }.bind(this);
 
@@ -106,7 +110,7 @@
                 return;
             }
 
-            var pinnedContactManager = this.getPinnedContactManager();
+            var pinnedContactManager = getPinnedContactManager();
             pinnedContactManager.requestUnpinContactAsync(contact, Windows.ApplicationModel.Contacts.PinnedContactSurface.taskbar);
         }.bind(this);
 
@@ -118,8 +122,8 @@
                 return;
             }
 
-            var pinnedContactManager = this.getPinnedContactManager();
-            pinnedContactManager.requestPinContactsAsync(contacts, Windows.ApplicationModel.Contacts.PinnedContactSurface.taskbar);
+            var pinnedContactManager = getPinnedContactManager();
+            return pinnedContactManager.requestPinContactsAsync(contacts, Windows.ApplicationModel.Contacts.PinnedContactSurface.taskbar);
         }.bind(this);
 
         // There is currently no batch operation for unpinning contacts.

@@ -258,7 +258,11 @@
 
             var selectedContacts = [];
 
-            //
+            /**
+             * 
+             * @param contact
+             * @param isSelected
+             */
             function setContactSelected(contact, isSelected) {
 
                 var template = contactCollectionContent.querySelector("[data-contact-id='" + contact.id + "']");
@@ -290,11 +294,18 @@
                 }
             }
 
-            //
+            /**
+             * 
+             * @param e
+             */
             function onUpdateContactButtonClick(e) {
 
             }
 
+            /**
+             * 
+             * @param contact
+             */
             function updateCurrentContact(contact) {
                 // Contact bound during onCreateContactButtonClick
                 var currentContact = contact;
@@ -326,7 +337,10 @@
                 currentContactPanel.appendChild(contactDetailsTemplate);
             }
 
-            //
+            /**
+             * 
+             * @param e
+             */
             function onContactClick(e) {
 
                 // Contact bound during onCreateContactButtonClick
@@ -338,15 +352,35 @@
                 setContactSelected(currentContact, selectedContacts.indexOf(currentContact) === -1);
             }
 
-            //
+            /**
+             * 
+             * @param e
+             */
             function onCreateContactButtonClick(e) {
 
-                var first = currentContactPanel.querySelector("#contactFirstName input").value;
-                var last = currentContactPanel.querySelector("#contactLastName input").value;
-                var email = currentContactPanel.querySelector("#contactEmail input").value;
+                var first = currentContactPanel.querySelector("#contactFirstName input");
+                var last = currentContactPanel.querySelector("#contactLastName input");
+                var email = currentContactPanel.querySelector("#contactEmail input");
+
+                if (first.value.trim() === "" || last.value.trim() === "" || email.value.trim() === "") {
+
+                    function updateBorderColor(input) {
+                        if (input.value.trim() === "") {
+                            input.style.borderColor = "red";
+                        }
+                        else {
+                            input.style.borderColor = "";
+                        }
+                    }
+
+                    updateBorderColor(first);
+                    updateBorderColor(last);
+                    updateBorderColor(email);
+                    return;
+                }
 
                 // Create the new contact
-                viewModel.CreateNewContactAsync(first, last, email)
+                viewModel.CreateNewContactAsync(first.value, last.value, email.value)
                     .then(function (contact) {
 
                         // Add the new contact to the UI
@@ -354,7 +388,7 @@
 
                         // Update the template values
                         var contactName = contactTemplate.querySelector("#contactName");
-                        contactName.innerHTML = first + ' ' + last;
+                        contactName.innerHTML = first.value + ' ' + last.value;
 
                         contactTemplate.setAttribute("data-contact-id", contact.id);
 
@@ -373,7 +407,9 @@
                     });
             }
 
-            // 
+            /**
+             * 
+             */
             newContactButton.addEventListener("click", function (e) {
 
                 // Clear out the currentContact
@@ -394,9 +430,11 @@
                 currentContactPanel.appendChild(contactDetailsTemplate);
             });
 
-            // 
+            /**
+             * 
+             */
             pinSelectedButton.addEventListener("click", function (e) {
-                var contacts = []; // Get selected contacts from page
+                var contacts = selectedContacts;
 
                 viewModel.PinMultipleContactsAsync(contacts)
                     .then(function () {
@@ -404,7 +442,9 @@
                     });
             });
 
-            // Select all of the deselected contacts
+            /**
+             * Select all of the deselected contacts
+             */
             selectAllButton.addEventListener("click", function (e) {
 
                 for (i = 0; i < viewModel.Contacts.length; i++) {
@@ -416,7 +456,9 @@
                 }
             });
 
-            // Deselect all of the selected contacts
+            /**
+             * Deselect all of the selected contacts
+             */
             deselectAllButton.addEventListener("click", function (e) {
 
                 for (i = 0; i < selectedContacts.length; i++) {
