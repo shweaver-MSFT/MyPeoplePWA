@@ -178,6 +178,7 @@
             <button id="updateContactButton" class="hidden">Update Contact</button>
             <button id="pinContactButton" class="hidden">Pin Contact</button>
             <button id="unpinContactButton" class="hidden">Unpin Contact</button>
+            <button id="deleteContactButton" class="hidden">Delete Contact</button>
         </div>
 
         <!-- Contact Template (for contacts collection) -->
@@ -238,7 +239,7 @@
                         });
                 }.bind(this);
 
-                this.UnpinContactAsync = function () {
+                this.UnpinContactAsync = function (contact) {
                     return myPeople.UnpinContactAsync(contact)
                         .then(function () {
                             logger.Log("Contact Unpinned from Taskbar");
@@ -248,6 +249,14 @@
 
                 this.PinMultipleContactsAsync = function (contacts) {
                     return myPeople.PinMultipleContactsAsync(contacts)
+                        .then(function () {
+                            logger.Log("Contacts Pinned to Taskbar");
+                            return Promise.resolve();
+                        });
+                }.bind(this);
+
+                this.UpdateContactAsync = function (contact) {
+                    return contacts.UpdateContactsAsync(contacts)
                         .then(function () {
                             logger.Log("Contacts Pinned to Taskbar");
                             return Promise.resolve();
@@ -270,6 +279,26 @@
             var contactCollectionContent = contactCollectionPanel.querySelector("#contactCollectionContent");
 
             var selectedContacts = [];
+
+            /**
+             * 
+             * @param contact
+             * @param isFocused
+             */
+            function setContactFocused(currentContact) {
+                // Update the focus indicator
+                for (i = 0; i < viewModel.Contacts.length; i++) {
+                    var contact = viewModel.Contacts[i];
+                    var template = contactCollectionContent.querySelector("[data-contact-id='" + contact.id + "']");
+
+                    if (contact == currentContact) {
+                        template.classList.add("focused");
+                    }
+                    else {
+                        template.classList.remove("focused");
+                    }
+                }
+            }
 
             /**
              * 
@@ -312,19 +341,51 @@
              * @param e
              */
             function onUpdateContactButtonClick(e) {
+                var contact = this.contact;
 
+                viewModel.UpdateContactAsync(contact)
+                    .then(function () {
+
+                    });
             }
 
+            /**
+             * 
+             * @param e
+             */
             function onPinContactButtonClick(e) {
+                var contact = this.contact;
 
+                viewModel.PinContactAsync(contact)
+                    .then(function () {
+
+                    });
             }
 
+            /**
+             * 
+             * @param e
+             */
             function onUnpinContactButtonClick(e) {
+                var contact = this.contact;
 
+                viewModel.UnpinContactAsync(contact)
+                    .then(function () {
+
+                    });
             }
 
+            /**
+             * 
+             * @param e
+             */
             function onDeleteContactButtonClick(e) {
+                var contact = this.contact;
 
+                viewModel.DeleteContactAsync(contact)
+                    .then(function () {
+
+                    });
             }
 
             /**
@@ -359,15 +420,15 @@
                 // Wire up additional edit buttons
                 var pinContactButton = contactDetailsTemplate.querySelector("#pinContactButton");
                 pinContactButton.classList.remove("hidden");
-                pinContactButton.onclick = onPinContactButtonClick.bind(this);
+                pinContactButton.onclick = onPinContactButtonClick.bind({ 'contact': currentContact });
 
                 var unpinContactButton = contactDetailsTemplate.querySelector("#unpinContactButton");
                 unpinContactButton.classList.remove("hidden");
-                unpinContactButton.onclick = onUnpinContactButtonClick.bind(this);
+                unpinContactButton.onclick = onUnpinContactButtonClick.bind({ 'contact': currentContact });
 
-                var deleteContactButton = contactDetailsTemplate.querySelector("#deleteSelectedButton");
+                var deleteContactButton = contactDetailsTemplate.querySelector("#deleteContactButton");
                 deleteContactButton.classList.remove("hidden");
-                deleteContactButton.onclick = onDeleteContactButtonClick.bind(this);
+                deleteContactButton.onclick = onDeleteContactButtonClick.bind({ 'contact': currentContact });
 
                 // Add the updated template to the currentContactPanel
                 currentContactPanel.appendChild(contactDetailsTemplate);
@@ -387,19 +448,7 @@
                 // Update the contact selection status
                 setContactSelected(currentContact, selectedContacts.indexOf(currentContact) === -1);
 
-                // Update the focus indicator
-                for (i = 0; i < viewModel.Contacts.length; i++) {
-                    var contact = viewModel.Contacts[i];
-                    var template = contactCollectionContent.querySelector("[data-contact-id='" + contact.id + "']");
-
-                    if (contact == currentContact) {
-                        template.classList.add("focused");
-                    }
-                    else {
-                        template.classList.remove("focused");
-                    }
-                }
-                //???.classList.
+                setContactFocused(currentContact);
             }
 
             /**
@@ -454,6 +503,7 @@
 
                         updateCurrentContact(contact);
                         setContactSelected(contact, false);
+                        setContactFocused(contact);
                     });
             }
 
