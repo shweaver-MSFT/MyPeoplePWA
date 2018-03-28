@@ -1,12 +1,13 @@
 ﻿(function () {
 
     var logger = document.logger;
+    var app = document.app;
 
     var ActivationService = function () {
 
         // 
         function onLaunched(args) {
-            logger.Log("Launch activated");
+            app.SetActivationType("Launch activated");
 
             var activation = Windows.ApplicationModel.Activation;
 
@@ -20,7 +21,7 @@
 
         // 
         function onProtocolActivated(args) {
-            logger.Log("Protocol Activated");
+            app.SetActivationType("Protocol Activated");
 
             var protocol = args.Uri.absoluteUri;
             // TODO: Handle protocol activation
@@ -28,7 +29,7 @@
 
         // 
         function onShareTargetActivated(args) {
-            logger.Log("ShareTarget Activated");
+            app.SetActivationType("ShareTarget Activated");
             // TODO: Handle shareTarget activation
         }
 
@@ -37,7 +38,7 @@
         // You should keep a reference to this ContactPanel object, which will allow you to interact with the panel.
         // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#running-in-the-contact-panel
         function onContactPanelActivated(args) {
-            logger.Log("ContectPanel Activated");
+            app.SetActivationType("ContectPanel Activated");
 
             var contactPanel = args.contactPanel; // TODO: Check that this is the right arg
             document.myPeople.RegisterContactPanel(contactPanel);
@@ -45,7 +46,7 @@
 
         // 
         function onWebActivated(args) {
-            logger.Log("Web Activated");
+            app.SetActivationType("Web Activated");
         }
 
         // The most recent activation args

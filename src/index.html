@@ -9,117 +9,13 @@
     <title>MyPeople PWA</title>
 
     <link href="css/global.css" rel="stylesheet">
-
-    <style>
-        #contentRoot {
-            font-family: 'Segoe UI';
-            width: 100%;
-            height: 100%;
-            text-align: center;
-        }
-
-        #headerPanel {
-            position: absolute;
-            left: 12px;
-            top: 12px;
-            font-size: 20pt;
-        }
-
-        /* New or Edit Current Contact Panel */
-        #currentContactPanel {
-            margin-top: 48px;
-            margin-bottom: 48px;
-            display: inline-block;
-            text-align: left;
-        }
-
-            #currentContactPanel #contentWrapper {
-                border: 1px solid black;
-            }
-
-            #currentContactPanel #newOrEditIndicator {
-                width: 100%;
-            }
-
-            #currentContactPanel #contactPicPanel {
-                display: inline-block;
-                width: 100px;
-                height: 100px;
-            }
-
-            #currentContactPanel #contactDetailsPanel {
-                display: inline-block;
-            }
-
-                #currentContactPanel #contactDetailsPanel #contactName div {
-                    display: inline-block;
-                }
-
-        /* Contact Commands Panel */
-        #contactCommandsPanel {
-            display: inline-block;
-            width: 90vw;
-            text-align: center;
-        }
-
-            #contactCommandsPanel div {
-                display: inline-block;
-            }
-
-            #contactCommandsPanel #contactOptionsPanel {
-                float: left;
-            }
-
-            #contactCommandsPanel #contactSelectionOptionsPanel {
-            }
-
-            #contactCommandsPanel #contactCollectionOptionsPanel {
-                float: right;
-            }
-
-        /* Contact Collection Panel */
-        #contactCollectionPanel {
-            width: 90vw;
-            height: auto;
-            display: inline-block;
-        }
-
-            #contactCollectionPanel #contactCollectionEmptyState {
-                
-            }
-
-            #contactCollectionPanel #contactCollectionContent #contactTemplate {
-                display: inline-block;
-                width: 200px;
-                height: 250px;
-                text-align: center;
-                margin: 4px;
-                padding: 12px;
-                background-color: transparent;
-            }
-
-                #contactCollectionPanel #contactCollectionContent #contactTemplate.selected {
-                    background-color: lightgray;
-                }
-
-                #contactCollectionPanel #contactCollectionContent #contactTemplate.focused {
-                    border: 3px solid black;
-                }
-
-        .hidden {
-            display: none;
-        }
-
-        .error {
-            border-color: red;
-        }
-    </style>
 </head>
 
 <body>
     <div id="contentRoot">
         <div id="headerPanel">
-            My People JS
+            My People JS - 
+            <span id="activationType"></span>
         </div>
 
         <!-- New or Edit Current Contact Panel -->
@@ -209,6 +105,15 @@
                 this.Contacts = [];
                 this.CurrentContact = null;
 
+                this.InitializeAsync = function () {
+                    // Load the contacts
+                    return contacts.GetContactsAsync()
+                        .then(function (contactList) {
+                            this.Contacts = contactList.contacts;
+                            return Promise.resolve()
+                        }.bind(this));
+                }
+
                 this.CreateNewContactAsync = function (first, last, email) {
                     return contacts.CreateContactAsync(first, last, email)
                         .then(function (contact) {
@@ -283,6 +188,15 @@
             /**
              * 
              * @param contact
+             */
+            function isContactFocused(contact) {
+                var template = contactCollectionContent.querySelector("[data-contact-id='" + contact.id + "']");
+                return template.classList.contains("focused");
+            }
+
+            /**
+             * 
+             * @param contact
              * @param isFocused
              */
             function setContactFocused(currentContact) {
@@ -291,7 +205,7 @@
                     var contact = viewModel.Contacts[i];
                     var template = contactCollectionContent.querySelector("[data-contact-id='" + contact.id + "']");
 
-                    if (contact == currentContact) {
+                    if (currentContact && contact == currentContact) {
                         template.classList.add("focused");
                     }
                     else {
@@ -436,6 +350,31 @@
 
             /**
              * 
+             * @param contact
+             */
+            function addContact(contact) {
+                // Add the new contact to the UI
+                var contactTemplate = templates.querySelector("#contactTemplate").cloneNode(true);
+
+                // Update the template values
+                var contactName = contactTemplate.querySelector("#contactName");
+                contactName.innerHTML = contact.displayName;
+
+                contactTemplate.setAttribute("data-contact-id", contact.id);
+
+                // Wire up selection interaction
+                // Bind the contact to the function for easy retrieval
+                contactTemplate.onclick = onContactClick.bind({ "contact": contact });
+
+                // Add the template to the UI
+                contactCollectionContent.appendChild(contactTemplate);
+
+                // Hide the empty state
+                contactCollectionEmptyState.classList.add("hidden");
+            }
+
+            /**
+             * 
              * @param e
              */
             function onContactClick(e) {
@@ -445,10 +384,12 @@
 
                 updateCurrentContact(currentContact);
 
-                // Update the contact selection status
-                setContactSelected(currentContact, selectedContacts.indexOf(currentContact) === -1);
-
-                setContactFocused(currentContact);
+                if (!isContactFocused(currentContact)) {
+                    setContactFocused(currentContact);
+                }
+                else {
+                    setContactSelected(currentContact, selectedContacts.indexOf(currentContact) === -1);
+                }
             }
 
             /**
@@ -482,25 +423,7 @@
                 viewModel.CreateNewContactAsync(first.value, last.value, email.value)
                     .then(function (contact) {
 
-                        // Add the new contact to the UI
-                        var contactTemplate = templates.querySelector("#contactTemplate").cloneNode(true);
-
-                        // Update the template values
-                        var contactName = contactTemplate.querySelector("#contactName");
-                        contactName.innerHTML = first.value + ' ' + last.value;
-
-                        contactTemplate.setAttribute("data-contact-id", contact.id);
-
-                        // Wire up selection interaction
-                        // Bind the contact to the function for easy retrieval
-                        contactTemplate.onclick = onContactClick.bind({ "contact": contact });
-
-                        // Add the template to the UI
-                        contactCollectionContent.appendChild(contactTemplate);
-
-                        // Hide the empty state
-                        contactCollectionEmptyState.classList.add("hidden");
-
+                        addContact(contact);
                         updateCurrentContact(contact);
                         setContactSelected(contact, false);
                         setContactFocused(contact);
@@ -528,6 +451,8 @@
 
                 // Add the updated template to the currentContactPanel
                 currentContactPanel.appendChild(contactDetailsTemplate);
+
+                setContactFocused(null);
             });
 
             /**
@@ -570,6 +495,15 @@
                     }
                 }
             });
+
+            // Init the VM
+            viewModel.InitializeAsync()
+                .then(function () {
+                    for (i = 0; i < viewModel.Contacts.length; i++) {
+                        var contact = viewModel.Contacts[i];
+                        addContact(contact);
+                    }
+                });
         })();
     </script>
 </body>

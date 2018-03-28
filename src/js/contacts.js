@@ -37,6 +37,13 @@
                 });
         };
 
+        this.GetContactsAsync = function () {
+            return getContactListAsync()
+                .then(function (contactList) {
+                    return contactList.getContactReader().readBatchAsync();
+                });
+        };
+
         // To allow contacts from your application to appear in the taskbar via the My People pane, 
         // you need to write them to the Windows contact store.
         //
