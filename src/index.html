@@ -315,6 +315,18 @@
 
             }
 
+            function onPinContactButtonClick(e) {
+
+            }
+
+            function onUnpinContactButtonClick(e) {
+
+            }
+
+            function onDeleteContactButtonClick(e) {
+
+            }
+
             /**
              * 
              * @param contact
@@ -338,13 +350,24 @@
                 contactDetailsTemplate.querySelector("#contactEmail input").value = currentContact.remoteId;
 
                 // Wire up the Update Contact button
-                var createContactButton = contactDetailsTemplate.querySelector("#createContactButton");
-                createContactButton.textContent = "Update Contact";
-                createContactButton.onclick = onUpdateContactButtonClick.bind({ "contact": currentContact });;
+                contactDetailsTemplate.querySelector("#createContactButton").classList.add("hidden");
+
+                var updateContactButton = contactDetailsTemplate.querySelector("#updateContactButton");
+                updateContactButton.classList.remove("hidden");
+                updateContactButton.onclick = onUpdateContactButtonClick.bind({ "contact": currentContact });;
 
                 // Wire up additional edit buttons
-                //var unpinContactButton = contactDetailsTemplate.querySelector("#unpinSelectedButton");
-                //var deleteContactButton = contactDetailsTemplate.querySelector("#deleteSelectedButton");
+                var pinContactButton = contactDetailsTemplate.querySelector("#pinContactButton");
+                pinContactButton.classList.remove("hidden");
+                pinContactButton.onclick = onPinContactButtonClick.bind(this);
+
+                var unpinContactButton = contactDetailsTemplate.querySelector("#unpinContactButton");
+                unpinContactButton.classList.remove("hidden");
+                unpinContactButton.onclick = onUnpinContactButtonClick.bind(this);
+
+                var deleteContactButton = contactDetailsTemplate.querySelector("#deleteSelectedButton");
+                deleteContactButton.classList.remove("hidden");
+                deleteContactButton.onclick = onDeleteContactButtonClick.bind(this);
 
                 // Add the updated template to the currentContactPanel
                 currentContactPanel.appendChild(contactDetailsTemplate);
