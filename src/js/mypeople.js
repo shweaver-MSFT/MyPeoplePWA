@@ -86,6 +86,19 @@
                 });
         }.bind(this);
 
+        //
+        this.DeleteContactAnnotationsAsync = function (contact) {
+            getAnnotationListAsync()
+                .then(function (annotationList) {
+                    return annotationList.findAnnotationsByRemoteIdAsync(contact.remoteId)
+                })
+                .then(function (contactAnnotations) {
+                    var tasks = [];
+                    contactAnnotations.every((ca) => tasks.push(annotationList.deleteAnnotationAsync(ca)));
+                    return Promise.all(tasks);
+                });
+        }.bind(this);
+
         // You can pin contacts using the PinnedContactManager. 
         // The RequestPinContactAsync method provides the user with a confirmation dialog, 
         // so it must be called from your Application Single - Threaded Apartment(ASTA, or UI) thread.
@@ -130,6 +143,17 @@
         // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#pinning-and-unpinning-contacts
         this.UnpinMultipleContacts = function (contacts) {
             logger.Log("There is currently no batch operation for unpinning contacts.");
+        }.bind(this);
+
+        // 
+        this.IsContactPinned = function (contact) {
+            if (!window.Windows) {
+                logger.Log("MyPeople is not supported on web");
+                return;
+            }
+
+            var pinnedContactManager = getPinnedContactManager();
+            return pinnedContactManager.isContactPinned(contact, Windows.ApplicationModel.Contacts.PinnedContactSurface.taskbar);
         }.bind(this);
 
         // The ContactPanel object has two events your application should listen for:

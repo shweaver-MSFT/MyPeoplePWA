@@ -90,6 +90,7 @@
 
         #contactCollectionPanel #contactCollectionContent #contactTemplate.focused {
             border: 3px solid black;
+            margin: -3px;
         }
 
 .hidden {

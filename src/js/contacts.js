@@ -60,13 +60,15 @@
             // Use a unique value as the remoteId that we can key on later
             contact.remoteId = email;
 
-            //var email = new contacts.ContactEmail();
-            //email.address = email;
-            //contact.emails.add(email);
+            var contactEmail = new contacts.ContactEmail();
+            contactEmail.address = email;
+            contact.emails.append(contactEmail);
 
             return getContactListAsync()
-                .then(function (contactList) {
+                .then(function onSuccess(contactList) {
                     return contactList.saveContactAsync(contact);
+                }, function onError(e) {
+                    logger.Log("Failed to create new contact");
                 })
                 .then(function () {
                     return Promise.resolve(contact);
@@ -76,7 +78,10 @@
 
         // 
         this.DeleteContactAsync = function (contact) {
-
+            return getContactListAsync()
+                .then(function (contactList) {
+                    return contactList.deleteContactAsync(contact);
+                })
         }.bind(this);
     };
 

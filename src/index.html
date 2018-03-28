@@ -30,7 +30,6 @@
             </div>
             <div id="contactSelectionOptionsPanel">
                 <button id="pinSelectedButton" disabled>Pin Contact(s)</button>
-                <button id="deleteSelectedButton" disabled>Delete Contact(s)</button>
             </div>
             <div id="contactCollectionOptionsPanel">
                 <button id="selectAllButton" disabled>Select All</button>
@@ -103,27 +102,27 @@
                 var logger = document.logger;
 
                 this.Contacts = [];
-                this.CurrentContact = null;
 
                 this.InitializeAsync = function () {
                     // Load the contacts
                     return contacts.GetContactsAsync()
                         .then(function (contactList) {
-                            this.Contacts = contactList.contacts;
+                            contactList.contacts.every((c) => this.Contacts.push(c));
                             return Promise.resolve()
                         }.bind(this));
                 }
 
                 this.CreateNewContactAsync = function (first, last, email) {
+                    var currentContact;
                     return contacts.CreateContactAsync(first, last, email)
                         .then(function (contact) {
-                            this.CurrentContact = contact;
+                            currentContact = contact;
                             this.Contacts.push(contact);
                             return myPeople.AnnotateContactAsync(contact);
                         }.bind(this))
                         .then(function (annotation) {
                             logger.Log("New Contact Created and Annotated");
-                            return Promise.resolve(this.CurrentContact);
+                            return Promise.resolve(currentContact);
                         }.bind(this));
                 }.bind(this);
 
@@ -131,9 +130,16 @@
                     return contacts.DeleteContactAsync(contact)
                         .then(function () {
                             logger.Log("Contact Deleted");
-                            this.Contacts.remove(contact);
+                            var i = this.Contacts.indexOf(contact);
+                            if (i != -1) {
+                                this.Contacts.splice(i, 1);
+                            }
+                            return myPeople.DeleteContactAnnotationsAsync(contact)
+                        }.bind(this))
+                        .then(function () {
+                            logger.Log("Contact Annotations Deleted");
                             return Promise.resolve();
-                        });
+                        }.bind(this));
                 }.bind(this);
 
                 this.PinContactAsync = function (contact) {
@@ -166,6 +172,10 @@
                             logger.Log("Contacts Pinned to Taskbar");
                             return Promise.resolve();
                         });
+                }.bind(this);
+
+                this.IsContactPinned = function (contact) {
+                    return myPeople.IsContactPinned(contact);
                 }.bind(this);
             };
 
@@ -216,6 +226,29 @@
 
             /**
              * 
+             */
+            function updateSelectionButtons() {
+                selectAllButton.disabled = !(selectedContacts.length < viewModel.Contacts.length);
+                deselectAllButton.disabled = !(selectedContacts.length > 0);
+
+                pinSelectedButton.disabled = selectedContacts.length === 0;
+            }
+
+            /**
+             * 
+             */
+            function updateCurrentContactButtons(contact) {
+                var isPinned = viewModel.IsContactPinned(contact);
+
+                var pinContactButton = currentContactPanel.querySelector("#pinContactButton");
+                pinContactButton.disabled = isPinned;
+
+                var unpinContactButton = currentContactPanel.querySelector("#unpinContactButton");
+                unpinContactButton.disabled = !isPinned;
+            }
+
+            /**
+             * 
              * @param contact
              * @param isSelected
              */
@@ -232,21 +265,13 @@
                         }
 
                         template.classList.remove("selected");
-
-                        if (selectedContacts.length === 0) {
-                            pinSelectedButton.disabled = true;
-                        }
                     }
                     else {
                         selectedContacts.push(contact);
-
                         template.classList.add("selected");
-
-                        pinSelectedButton.disabled = false;
                     }
 
-                    selectAllButton.disabled = !(selectedContacts.length < viewModel.Contacts.length);
-                    deselectAllButton.disabled = !(selectedContacts.length > 0);
+                    updateSelectionButtons();
                 }
             }
 
@@ -272,7 +297,7 @@
 
                 viewModel.PinContactAsync(contact)
                     .then(function () {
-
+                        updateCurrentContactButtons(contact);
                     });
             }
 
@@ -285,7 +310,7 @@
 
                 viewModel.UnpinContactAsync(contact)
                     .then(function () {
-
+                        updateCurrentContactButtons(contact);
                     });
             }
 
@@ -298,7 +323,9 @@
 
                 viewModel.DeleteContactAsync(contact)
                     .then(function () {
-
+                        removeContact(contact);
+                        currentContactPanel.innerHTML = "";
+                        updateSelectionButtons();
                     });
             }
 
@@ -332,12 +359,16 @@
                 updateContactButton.onclick = onUpdateContactButtonClick.bind({ "contact": currentContact });;
 
                 // Wire up additional edit buttons
+                var isPinned = viewModel.IsContactPinned(currentContact);
+
                 var pinContactButton = contactDetailsTemplate.querySelector("#pinContactButton");
                 pinContactButton.classList.remove("hidden");
+                pinContactButton.disabled = isPinned;
                 pinContactButton.onclick = onPinContactButtonClick.bind({ 'contact': currentContact });
 
                 var unpinContactButton = contactDetailsTemplate.querySelector("#unpinContactButton");
                 unpinContactButton.classList.remove("hidden");
+                unpinContactButton.disabled = !isPinned;
                 unpinContactButton.onclick = onUnpinContactButtonClick.bind({ 'contact': currentContact });
 
                 var deleteContactButton = contactDetailsTemplate.querySelector("#deleteContactButton");
@@ -375,6 +406,15 @@
 
             /**
              * 
+             * @param contact
+             */
+            function removeContact(contact) {
+                var template = contactCollectionContent.querySelector("[data-contact-id='" + contact.id + "']");
+                template.remove();
+            }
+
+            /**
+             * 
              * @param e
              */
             function onContactClick(e) {
@@ -402,11 +442,13 @@
                 var last = currentContactPanel.querySelector("#contactLastName input");
                 var email = currentContactPanel.querySelector("#contactEmail input");
 
+                var isError = false;
                 if (first.value.trim() === "" || last.value.trim() === "" || email.value.trim() === "") {
 
                     function updateBorderColor(input) {
                         if (input.value.trim() === "") {
                             input.classList.add("error");
+                            isError = true;
                         }
                         else {
                             input.classList.remove("error");
@@ -416,13 +458,23 @@
                     updateBorderColor(first);
                     updateBorderColor(last);
                     updateBorderColor(email);
-                    return;
                 }
+
+                // Validate the email a bit. This helps ensure that when creating new contacts they have a usable email to test sharing with.
+                var re = new RegExp("[a - z0 - 9!#$ %& '*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&' * +/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?");
+                if (re.test(email.value.toLowerCase())) {
+                    email.classList.add("error");
+                    isError = true;
+                }
+                else {
+                    email.classList.remove("error");
+                }
+
+                if (isError) return;
 
                 // Create the new contact
                 viewModel.CreateNewContactAsync(first.value, last.value, email.value)
                     .then(function (contact) {
-
                         addContact(contact);
                         updateCurrentContact(contact);
                         setContactSelected(contact, false);
@@ -503,6 +555,8 @@
                         var contact = viewModel.Contacts[i];
                         addContact(contact);
                     }
+
+                    updateSelectionButtons();
                 });
         })();
     </script>
