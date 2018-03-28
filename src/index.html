@@ -121,11 +121,10 @@
             </div>
             <div id="contactSelectionOptionsPanel">
                 <button id="pinSelectedButton" disabled>Pin Contact(s)</button>
-                <button id="unpinSelectedButton" disabled>Unpin Contact(s)</button>
                 <button id="deleteSelectedButton" disabled>Delete Contact(s)</button>
             </div>
             <div id="contactCollectionOptionsPanel">
-                <button id="selectAllButton">Select All</button>
+                <button id="selectAllButton" disabled>Select All</button>
                 <button id="deselectAllButton" disabled>Deselect All</button>
             </div>
         </div>
@@ -135,9 +134,7 @@
         <!-- Contact Collection Panel -->
         <div id="contactCollectionPanel">
             <div id="contactCollectionEmptyState">You have no contacts yet. Try creating a new one!</div>
-            <div id="contactCollectionContent">
-
-            </div>
+            <div id="contactCollectionContent"></div>
         </div>
     </div>
 
@@ -165,6 +162,9 @@
                 </div>
             </div>
             <button id="createContactButton">Create Contact</button>
+            <button id="updateContactButton" class="hidden">Update Contact</button>
+            <button id="pinContactButton" class="hidden">Pin Contact</button>
+            <button id="unpinContactButton" class="hidden">Unpin Contact</button>
         </div>
 
         <!-- Contact Template (for contacts collection) -->
@@ -264,17 +264,29 @@
                 var template = contactCollectionContent.querySelector("[data-contact-id='" + contact.id + "']");
 
                 if (template) {
-                    if (isSelected == true) {
+
+                    if (isSelected == false) {
                         var i = selectedContacts.indexOf(contact);
                         if (i != -1) {
                             selectedContacts.splice(i, 1);
                         }
-                        template.style.backgroundColor = "blue";
+
+                        template.style.backgroundColor = "white";
+
+                        if (selectedContacts.length === 0) {
+                            pinSelectedButton.disabled = true;
+                        }
                     }
                     else {
                         selectedContacts.push(contact);
-                        template.style.backgroundColor = "white";
+
+                        template.style.backgroundColor = "blue";
+
+                        pinSelectedButton.disabled = false;
                     }
+
+                    selectAllButton.disabled = !(selectedContacts.length < viewModel.Contacts.length);
+                    deselectAllButton.disabled = !(selectedContacts.length > 0);
                 }
             }
 
@@ -283,14 +295,9 @@
 
             }
 
-            //
-            function onContactClick(e) {
-
+            function updateCurrentContact(contact) {
                 // Contact bound during onCreateContactButtonClick
-                var currentContact = this.contact;
-
-                // Update the contact selection status
-                setContactSelected(currentContact, selectedContacts.indexOf(currentContact) >= 0);
+                var currentContact = contact;
 
                 // Clear out the currentContact
                 currentContactPanel.innerHTML = "";
@@ -304,7 +311,7 @@
 
                 contactDetailsTemplate.querySelector("#contactFirstName input").value = currentContact.firstName;
                 contactDetailsTemplate.querySelector("#contactLastName input").value = currentContact.lastName;
-                contactDetailsTemplate.querySelector("#contactEmail input").value = currentContact.address;
+                contactDetailsTemplate.querySelector("#contactEmail input").value = currentContact.remoteId;
 
                 // Wire up the Update Contact button
                 var createContactButton = contactDetailsTemplate.querySelector("#createContactButton");
@@ -317,6 +324,18 @@
 
                 // Add the updated template to the currentContactPanel
                 currentContactPanel.appendChild(contactDetailsTemplate);
+            }
+
+            //
+            function onContactClick(e) {
+
+                // Contact bound during onCreateContactButtonClick
+                var currentContact = this.contact;
+
+                updateCurrentContact(currentContact);
+
+                // Update the contact selection status
+                setContactSelected(currentContact, selectedContacts.indexOf(currentContact) === -1);
             }
 
             //
@@ -349,11 +368,10 @@
                         // Hide the empty state
                         contactCollectionEmptyState.classList.add("hidden");
 
-                        // 
-                        contactTemplate.onclick();
+                        updateCurrentContact(contact);
+                        setContactSelected(contact, false);
                     });
             }
-
 
             // 
             newContactButton.addEventListener("click", function (e) {
@@ -386,30 +404,29 @@
                     });
             });
 
-            // 
-            //deleteContactButton.addEventListener("click", function (e) {
-
-            //    var contact = null;
-
-            //    viewModel.DeleteContactAsync(contact)
-            //        .then(function () {
-
-            //        });
-            //});
-
-            // 
+            // Select all of the deselected contacts
             selectAllButton.addEventListener("click", function (e) {
 
-                var contacts = [];
+                for (i = 0; i < viewModel.Contacts.length; i++) {
+                    var contact = viewModel.Contacts[i];
 
-                // Add all contacts to selectedContacts
-                
+                    if (selectedContacts.indexOf(contact) === -1) {
+                        setContactSelected(contact, true);
+                    }
+                }
             });
 
-            // 
+            // Deselect all of the selected contacts
             deselectAllButton.addEventListener("click", function (e) {
-                // Remove all contacts from selectedContacts
-                selectedContacts = [];
+
+                for (i = 0; i < selectedContacts.length; i++) {
+                    var contact = selectedContacts[i];
+
+                    if (selectedContacts.indexOf(contact) >= 0) {
+                        setContactSelected(contact, false);
+                        i--;
+                    }
+                }
             });
         })();
     </script>

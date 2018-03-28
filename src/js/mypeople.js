@@ -100,7 +100,7 @@
         // The RequestUnpinContactAsync method provides the user with a confirmation dialog,
         // so it must be called from your Application Single - Threaded Apartment(ASTA, or UI) thread.
         // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#pinning-and-unpinning-contacts
-        this.UnpinContact = function (contact) {
+        this.UnpinContactAsync = function (contact) {
             if (!window.Windows) {
                 logger.Log("MyPeople is not supported on web");
                 return;
@@ -112,7 +112,7 @@
 
         // You can pin multiple contacts at the same time using the PinnedContactManager.
         // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#pinning-and-unpinning-contacts
-        this.PinMultipleContacts = function (contacts) {
+        this.PinMultipleContactsAsync = function (contacts) {
             if (!window.Windows) {
                 logger.Log("MyPeople is not supported on web");
                 return;
