@@ -95,10 +95,23 @@
                 text-align: center;
                 margin: 4px;
                 padding: 12px;
+                background-color: transparent;
             }
+
+                #contactCollectionPanel #contactCollectionContent #contactTemplate.selected {
+                    background-color: lightgray;
+                }
+
+                #contactCollectionPanel #contactCollectionContent #contactTemplate.focused {
+                    border: 3px solid black;
+                }
 
         .hidden {
             display: none;
+        }
+
+        .error {
+            border-color: red;
         }
     </style>
 </head>
@@ -275,7 +288,7 @@
                             selectedContacts.splice(i, 1);
                         }
 
-                        template.style.backgroundColor = "white";
+                        template.classList.remove("selected");
 
                         if (selectedContacts.length === 0) {
                             pinSelectedButton.disabled = true;
@@ -284,7 +297,7 @@
                     else {
                         selectedContacts.push(contact);
 
-                        template.style.backgroundColor = "blue";
+                        template.classList.add("selected");
 
                         pinSelectedButton.disabled = false;
                     }
@@ -350,6 +363,20 @@
 
                 // Update the contact selection status
                 setContactSelected(currentContact, selectedContacts.indexOf(currentContact) === -1);
+
+                // Update the focus indicator
+                for (i = 0; i < viewModel.Contacts.length; i++) {
+                    var contact = viewModel.Contacts[i];
+                    var template = contactCollectionContent.querySelector("[data-contact-id='" + contact.id + "']");
+
+                    if (contact == currentContact) {
+                        template.classList.add("focused");
+                    }
+                    else {
+                        template.classList.remove("focused");
+                    }
+                }
+                //???.classList.
             }
 
             /**
@@ -366,10 +393,10 @@
 
                     function updateBorderColor(input) {
                         if (input.value.trim() === "") {
-                            input.style.borderColor = "red";
+                            input.classList.add("error");
                         }
                         else {
-                            input.style.borderColor = "";
+                            input.classList.remove("error");
                         }
                     }
 
