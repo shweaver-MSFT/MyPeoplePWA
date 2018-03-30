@@ -1,0 +1,306 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>MyPeople PWA</title>
+
+    <!--<link href="css/global.css" rel="stylesheet">-->
+
+
+    <style>
+
+        /* Sample header */
+        h1 {
+            font-size: 28px;
+            font-family: 'Segoe UI';
+            font-weight: bold;
+            line-height: 37px;
+        }
+
+        /* Section headers */
+        h2 {
+            font-size: 18px;
+            font-family: 'Segoe UI';
+            font-weight: bold;
+            line-height: 24px;
+            margin-left: 8px;
+        }
+
+        .contentRoot {
+
+        }
+
+        .headerPanel {
+            padding: 8px;
+            background-image: url(images/background.jpg);
+        }
+
+            .headerPanel .h1 {
+                vertical-align: bottom;
+                display: inline-block;
+                margin-left: 8px;
+            }
+
+        .descriptionPanel {
+            padding: 8px;
+            display: inline-block;
+            width: 50%;
+        }
+
+            /*.descriptionPanel h2 {
+            }*/
+
+            .descriptionPanel p {
+            
+            }
+
+        .contactsPanel {
+            padding: 8px;
+            display: inline-block;
+            width: 50%;
+        }
+
+            /*.contactsPanel h2 {
+                
+            }*/
+
+            .contactsPanel .contacts {
+
+            }
+
+            .contactsPanel .contacts .contact {
+
+            }
+
+            .contactsPanel button {
+
+            }
+    </style>
+
+</head>
+
+<body>
+    <div class="contentRoot">
+
+        <div class="headerPanel">
+            <h1>My People sample</h1>
+        </div>
+
+        <div>
+            <div class="descriptionPanel">
+                <h2>About this sample</h2>
+                <p>
+                    This sample demonstrates how to integrate with the My People feature in Windows. 
+                    Select one or more contacts from the list on the right and tap 'add to My People'. 
+                    You will see the selected contacts appear in the My People area of your taskbar, 
+                    if you have this enabled. 
+                    <br />
+                    <br />
+                    Tap the 'show in People app' to see how contacts added to My People are available 
+                    to other apps across the operating system.
+                </p>
+            </div>
+
+            <div class="contactsPanel">
+                <h2>Contacts</h2>
+                <div class="contacts">
+
+                </div>
+                <button>Add to My People</button>
+                <button>Show in People app</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="templates" class="hidden">
+        <!-- Contact Template -->
+        <div class="contact">
+            <img id="contactImg" src="images/Contact.png" />
+            <div class="contactDetails">
+                <div class="contactName"></div>
+                <div class="contactEmail"></div>
+                <div class="contactPhone"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include scripts at the end, for perf. -->
+    <script src="js/logger.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/activation.js"></script>
+    <script src="js/contacts.js"></script>
+    <script src="js/mypeople.js"></script>
+    <script>
+        (function () {
+
+            /* Main ViewModel */
+            viewModel = new function () {
+
+                var contacts = document.contacts;
+                var myPeople = document.myPeople;
+                var logger = document.logger;
+
+                this.Contacts = [];
+
+                /**
+                 * Generate fake contact data
+                 */
+                function populateFakeContactsAsync() {
+                    // Create 3 fake contacts and add them using the contacts API.
+                    // Do not annotate them initially
+                    function createContactAsync(first, last, email, phone, img) {
+
+                    };
+
+                    return Promise.all([
+                        createContactAsync("Kim", "Abercrombie", "kim@contoso.com", "206-555-1234", "images/contact1.png"),
+                        createContactAsync("Tom", "Perham", "tom@contoso.com", "425-555-4433", "images/contact2.png"),
+                        createContactAsync("Hermes", "Galanos", "hermes@contoso.com", "206-555-7712", "images/contact3.png")
+                    ]);
+                }
+
+                /**
+                 * 
+                 */
+                this.InitializeAsync = function () {
+                    return contacts.GetContactsAsync()
+                        .then(function (contactList) {
+                            return (!contactList || contactList.length === 0) // Check if contacts exist.
+                                ? populateFakeContactsAsync().then(contacts.GetContactsAsync) // If empty, generate fake contacts
+                                : Promise.resolve(contactList); // otherwise, forward the contactList.
+                        })
+                        .then(function (contactList) {
+                            contactList.contacts.every((c) => this.Contacts.push(c));
+                            return Promise.resolve()
+                        }.bind(this));
+                }
+
+                //this.CreateNewContactAsync = function (first, last, email, phone) {
+                //    var currentContact;
+                //    return contacts.CreateContactAsync(first, last, email, phone)
+                //        .then(function (contact) {
+                //            currentContact = contact;
+                //            this.Contacts.push(contact);
+                //            return myPeople.AnnotateContactAsync(contact);
+                //        }.bind(this))
+                //        .then(function (annotation) {
+                //            logger.Log("New Contact Created and Annotated");
+                //            return Promise.resolve(currentContact);
+                //        }.bind(this));
+                //}.bind(this);
+
+                //this.DeleteContactAsync = function (contact) {
+                //    return contacts.DeleteContactAsync(contact)
+                //        .then(function () {
+                //            logger.Log("Contact Deleted");
+                //            var i = this.Contacts.indexOf(contact);
+                //            if (i != -1) {
+                //                this.Contacts.splice(i, 1);
+                //            }
+                //            return myPeople.DeleteContactAnnotationsAsync(contact)
+                //        }.bind(this))
+                //        .then(function () {
+                //            logger.Log("Contact Annotations Deleted");
+                //            return Promise.resolve();
+                //        }.bind(this));
+                //}.bind(this);
+
+                this.PinContactAsync = function (contact) {
+                    return myPeople.PinContactAsync(contact)
+                        .then(function () {
+                            logger.Log("Contact Pinned to Taskbar");
+                            return Promise.resolve();
+                        });
+                }.bind(this);
+
+                this.UnpinContactAsync = function (contact) {
+                    return myPeople.UnpinContactAsync(contact)
+                        .then(function () {
+                            logger.Log("Contact Unpinned from Taskbar");
+                            return Promise.resolve();
+                        });
+                }.bind(this);
+
+                this.PinMultipleContactsAsync = function (contacts) {
+                    return myPeople.PinMultipleContactsAsync(contacts)
+                        .then(function () {
+                            logger.Log("Contacts Pinned to Taskbar");
+                            return Promise.resolve();
+                        });
+                }.bind(this);
+
+                this.UpdateContactAsync = function (contact) {
+                    return contacts.UpdateContactAsync(contacts)
+                        .then(function () {
+                            logger.Log("Contacts Pinned to Taskbar");
+                            return Promise.resolve();
+                        });
+                }.bind(this);
+
+                this.IsContactPinned = function (contact) {
+                    return myPeople.IsContactPinned(contact);
+                }.bind(this);
+            };
+
+            /* Main View */
+            view = new function () {
+                /**
+                 * 
+                 * @param contact
+                 */
+                function addContact(contact) {
+                    var contactTemplate = document.querySelector("#templates .contact").cloneNode();
+
+                    var contactImg = contactTemplate.querySelector(".contactImg");
+                    var contactName = contactTemplate.querySelector(".contactName");
+                    var contactEmail = contactTemplate.querySelector(".contactEmail");
+                    var contactPhone = contactTemplate.querySelector(".contactPhone");
+
+                    contactImg.src = "";
+                    contactName.innerHTML = contact.displayName;
+                    contactEmail.innerHTML = "";
+                    contactPhone.innerHTML = "";
+
+                    var isPinned = viewModel.IsContactPinned(currentContact);
+                    // TODO: Update pinned icon
+
+                    contactTemplate.setAttribute("data-contact-id", contact.id);
+
+                    var contacts = document.querySelector(".contactsPanel .contacts");
+                    contacts.appendChild(contactTemplate);
+                }
+
+                /**
+                 * Annotates a contact
+                 * @param e
+                 */
+                function onAddToMyPeopleClick(e) {
+                    
+                }
+
+                /**
+                 * 
+                 * @param e
+                 */
+                function onShowInPeopleAppClick(e) {
+
+                }
+
+                // Init the VM
+                viewModel.InitializeAsync()
+                    .then(function () {
+                        for (i = 0; i < viewModel.Contacts.length; i++) {
+                            var contact = viewModel.Contacts[i];
+                            addContact(contact);
+                        }
+                    });
+            }();
+        })();
+    </script>
+</body>
+</html>

@@ -5,28 +5,28 @@ VisualStudioVersion = 15.0.27520.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{262852C6-CD72-467D-83FE-5EEB1973A190}") = "MyPeoplePWA", "MyPeoplePWA\MyPeoplePWA.jsproj", "{F3E45AE0-7C05-4987-8DDA-DE1261586328}"
 EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "src", "src\", "{45873DD0-DE6B-43A0-83CF-0B99352A7BC2}"
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "wwwroot", "wwwroot\", "{45873DD0-DE6B-43A0-83CF-0B99352A7BC2}"
 	ProjectSection(WebsiteProperties) = preProject
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
 		Debug.AspNetCompiler.VirtualPath = "/localhost_61228"
-		Debug.AspNetCompiler.PhysicalPath = "src\"
+		Debug.AspNetCompiler.PhysicalPath = "wwwroot\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_61228\"
 		Debug.AspNetCompiler.Updateable = "true"
 		Debug.AspNetCompiler.ForceOverwrite = "true"
 		Debug.AspNetCompiler.FixedNames = "false"
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.VirtualPath = "/localhost_61228"
-		Release.AspNetCompiler.PhysicalPath = "src\"
+		Release.AspNetCompiler.PhysicalPath = "wwwroot\"
 		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_61228\"
 		Release.AspNetCompiler.Updateable = "true"
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
 		VWDPort = "61228"
-		SlnRelativePath = "src\"
+		SlnRelativePath = "wwwroot\"
 	EndProjectSection
 EndProject
-Project("{262852C6-CD72-467D-83FE-5EEB1973A190}") = "MyPeopleUWA", "src\MyPeopleUWA.jsproj", "{B6348509-B37E-4307-9E1F-E52A880E2642}"
+Project("{262852C6-CD72-467D-83FE-5EEB1973A190}") = "MyPeopleUWA", "wwwroot\MyPeopleUWA.jsproj", "{B6348509-B37E-4307-9E1F-E52A880E2642}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
