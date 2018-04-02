@@ -42,6 +42,9 @@
             return getContactListAsync()
                 .then(function (contactList) {
                     return contactList.getContactReader().readBatchAsync();
+                })
+                .then(function (contactBatch) {
+                    return contactBatch.contacts;
                 });
         };
 
@@ -50,26 +53,26 @@
         //
         // Your application must also write an annotation to each contact. 
         // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#annotating-contacts
-        this.CreateContactAsync = function (first, last, email, phone, img) {
+        this.SaveContactAsync = function (contact) {
 
             var contacts = Windows.ApplicationModel.Contacts;
 
-            var contact = new contacts.Contact();
-            contact.firstName = first;
-            contact.lastName = last;
+            //var contact = new contacts.Contact();
+            //contact.firstName = first;
+            //contact.lastName = last;
 
-            // Use a unique value as the remoteId that we can key on later
-            contact.remoteId = email;
+            //// Use a unique value as the remoteId that we can key on later
+            //contact.remoteId = email;
 
-            var contactEmail = new contacts.ContactEmail();
-            contactEmail.address = email;
-            contact.emails.append(contactEmail);
+            //var contactEmail = new contacts.ContactEmail();
+            //contactEmail.address = email;
+            //contact.emails.append(contactEmail);
 
-            var contactPhone = new contacts.ContactPhone();
-            contactPhone.number = phone;
-            contact.phones.append(contactPhone);
+            //var contactPhone = new contacts.ContactPhone();
+            //contactPhone.number = phone;
+            //contact.phones.append(contactPhone);
 
-            //contact.thumbnail = "";
+            ////contact.thumbnail = "";
 
             return getContactListAsync()
                 .then(function onSuccess(contactList) {

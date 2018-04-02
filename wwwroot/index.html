@@ -13,72 +13,143 @@
 
     <style>
 
+        body {
+            margin: 0;
+            font-family: 'Segoe UI';
+            font-size: 10px;
+            line-height: 14px;
+            color: #323232;
+        }
+
         /* Sample header */
         h1 {
             font-size: 28px;
-            font-family: 'Segoe UI';
             font-weight: bold;
             line-height: 37px;
+            color: #E6E6E6;
         }
 
         /* Section headers */
         h2 {
             font-size: 18px;
-            font-family: 'Segoe UI';
             font-weight: bold;
             line-height: 24px;
+        }
+
+        button {
+            height: 24px;
+            width: 96px;
+            background-color: #CCCCCC;
             margin-left: 8px;
+            font-family: 'Segoe UI';
+            font-size: 10px;
+            line-height: 14px;
+            color: #323232;
+            border: 0;
+            padding: 0;
         }
 
         .contentRoot {
-
+            display: flex;
+            flex-direction: column;
+            min-height: 100%;
+            position: absolute;
         }
+
+            .contentRoot > div {
+                flex: 1;
+            }
 
         .headerPanel {
-            padding: 8px;
             background-image: url(images/background.jpg);
+            background-size: cover;
+            background-position-y: center;
+            background-position-x: center;
+            min-height: 152px;
+            min-width: 704px;
+            position: relative;
         }
 
-            .headerPanel .h1 {
-                vertical-align: bottom;
-                display: inline-block;
-                margin-left: 8px;
+            .headerPanel h1 {
+                position: absolute;
+                bottom: 0;
+                margin: 8px 16px;
+            }
+
+        .contentPanel {
+            display: flex;
+            flex-direction: row;
+        }
+
+            .contentPanel > div {
+                flex: 1;
+                width: 50%;
+            }
+
+            .contentPanel h2 {
+                margin-left: 16px;
+                margin-top: 11px;
+                margin-bottom: 0px;
             }
 
         .descriptionPanel {
-            padding: 8px;
-            display: inline-block;
             width: 50%;
+            background-color: #F2F2F2;
         }
 
-            /*.descriptionPanel h2 {
-            }*/
-
             .descriptionPanel p {
-            
+                margin: 13px 16px;
             }
 
         .contactsPanel {
-            padding: 8px;
-            display: inline-block;
-            width: 50%;
+            background-color: #E6E6E6;
         }
 
-            /*.contactsPanel h2 {
-                
-            }*/
+            .contactsPanel > div {
+                margin-left: 8px;
+            }
 
             .contactsPanel .contacts {
-
+                margin-top: 5px;
             }
 
-            .contactsPanel .contacts .contact {
-
+            .contactsPanel .buttons {
+                margin-top: 32px;
             }
 
-            .contactsPanel button {
+        .contact {
+            width: 208px;
+            height: 64px;
+            display: flex;
+            flex-direction: row;
+        }
 
+            .contact img {
+                width: 48px;
+                height: 48px;
+                border-radius: 50%;
+                margin: 8px;
             }
+
+            .contact .contactDetails {
+                margin: 8px 0px;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .contact .contactDetails .contactName {
+                font-weight: 600; /* Semibold */
+                line-height: 21px;
+                font-size: 16px;
+            }
+
+        #templates {
+            display: none;
+        }
+
+        .selected {
+            background-color: #D8D8EB;
+        }
     </style>
 
 </head>
@@ -90,17 +161,17 @@
             <h1>My People sample</h1>
         </div>
 
-        <div>
+        <div class="contentPanel">
             <div class="descriptionPanel">
                 <h2>About this sample</h2>
                 <p>
-                    This sample demonstrates how to integrate with the My People feature in Windows. 
-                    Select one or more contacts from the list on the right and tap 'add to My People'. 
-                    You will see the selected contacts appear in the My People area of your taskbar, 
-                    if you have this enabled. 
+                    This sample demonstrates how to integrate with the My People feature in Windows.
+                    Select one or more contacts from the list on the right and tap 'add to My People'.
+                    You will see the selected contacts appear in the My People area of your taskbar,
+                    if you have this enabled.
                     <br />
                     <br />
-                    Tap the 'show in People app' to see how contacts added to My People are available 
+                    Tap the 'show in People app' to see how contacts added to My People are available
                     to other apps across the operating system.
                 </p>
             </div>
@@ -108,19 +179,20 @@
             <div class="contactsPanel">
                 <h2>Contacts</h2>
                 <div class="contacts">
-
+                    
                 </div>
-                <button>Add to My People</button>
-                <button>Show in People app</button>
+                <div class="buttons">
+                    <button>Add to My People</button>
+                    <button>Show in People app</button>
+                </div>
             </div>
         </div>
-
     </div>
 
-    <div id="templates" class="hidden">
+    <div id="templates">
         <!-- Contact Template -->
         <div class="contact">
-            <img id="contactImg" src="images/Contact.png" />
+            <img class="contactImg" src="images/Contact.png" />
             <div class="contactDetails">
                 <div class="contactName"></div>
                 <div class="contactEmail"></div>
@@ -154,7 +226,26 @@
                     // Create 3 fake contacts and add them using the contacts API.
                     // Do not annotate them initially
                     function createContactAsync(first, last, email, phone, img) {
+                        var contactsApi = Windows.ApplicationModel.Contacts;
 
+                        var contact = new contactsApi.Contact();
+                        contact.firstName = first;
+                        contact.lastName = last;
+
+                        // Use a unique value as the remoteId that we can key on later
+                        contact.remoteId = email;
+
+                        var contactEmail = new contactsApi.ContactEmail();
+                        contactEmail.address = email;
+                        contact.emails.append(contactEmail);
+
+                        var contactPhone = new contactsApi.ContactPhone();
+                        contactPhone.number = phone;
+                        contact.phones.append(contactPhone);
+
+                        //contact.thumbnail = "";
+
+                        return contacts.SaveContactAsync(contact);
                     };
 
                     return Promise.all([
@@ -174,8 +265,8 @@
                                 ? populateFakeContactsAsync().then(contacts.GetContactsAsync) // If empty, generate fake contacts
                                 : Promise.resolve(contactList); // otherwise, forward the contactList.
                         })
-                        .then(function (contactList) {
-                            contactList.contacts.every((c) => this.Contacts.push(c));
+                        .then(function (contacts) {
+                            contacts.every((c) => this.Contacts.push(c));
                             return Promise.resolve()
                         }.bind(this));
                 }
@@ -249,27 +340,45 @@
 
             /* Main View */
             view = new function () {
+
+                var selectedContact = null;
+
                 /**
                  * 
                  * @param contact
                  */
                 function addContact(contact) {
-                    var contactTemplate = document.querySelector("#templates .contact").cloneNode();
+                    var contactTemplate = document.querySelector("#templates .contact").cloneNode(true);
 
                     var contactImg = contactTemplate.querySelector(".contactImg");
                     var contactName = contactTemplate.querySelector(".contactName");
                     var contactEmail = contactTemplate.querySelector(".contactEmail");
                     var contactPhone = contactTemplate.querySelector(".contactPhone");
 
-                    contactImg.src = "";
+                    //contactImg.src = contact.thumbnail;
                     contactName.innerHTML = contact.displayName;
-                    contactEmail.innerHTML = "";
-                    contactPhone.innerHTML = "";
+                    contactEmail.innerHTML = contact.emails[0].address;
+                    contactPhone.innerHTML = contact.phones[0].number;
 
-                    var isPinned = viewModel.IsContactPinned(currentContact);
+                    var isPinned = viewModel.IsContactPinned(contact);
                     // TODO: Update pinned icon
 
                     contactTemplate.setAttribute("data-contact-id", contact.id);
+
+                    contactTemplate.addEventListener("click", function onContactClick(e) {
+                        var targetContact = e.currentTarget;
+                        if (selectedContact != targetContact) {
+                            if (selectedContact) {
+                                selectedContact.classList.remove("selected");
+                            }
+                            targetContact.classList.add("selected");
+                            selectedContact = targetContact;
+                        }
+                        else {
+                            targetContact.classList.remove("selected");
+                            selectedContact = null;
+                        }
+                    });
 
                     var contacts = document.querySelector(".contactsPanel .contacts");
                     contacts.appendChild(contactTemplate);
@@ -291,14 +400,18 @@
 
                 }
 
-                // Init the VM
+                // Init
                 viewModel.InitializeAsync()
                     .then(function () {
                         for (i = 0; i < viewModel.Contacts.length; i++) {
-                            var contact = viewModel.Contacts[i];
-                            addContact(contact);
+                            addContact(viewModel.Contacts[i]);
                         }
-                    });
+                    })
+                    .then(function () {
+
+                    });;
+
+
             }();
         })();
     </script>
