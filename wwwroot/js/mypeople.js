@@ -17,7 +17,7 @@
 
             var contacts = Windows.ApplicationModel.Contacts;
 
-            if (annotationStore == null) {
+            if (!annotationStore) {
                 return contacts.ContactManager.requestAnnotationStoreAsync(contacts.ContactAnnotationStoreAccessType.appAnnotationsReadWrite)
                     .then(function (e) {
                         annotationStore = e;
@@ -37,14 +37,14 @@
                     return annotationStore.findAnnotationListsAsync();
                 })
                 .then(function (annotationLists) {
-                    if (!annotationLists || annotationLists.length == 0) {
+                    if (!annotationLists || annotationLists.length === 0) {
                         return annotationStore.createAnnotationListAsync();
                     }
                     else {
                         return Promise.resolve(annotationLists[0]);
                     }
                 });
-        };
+        }
 
         // The PinnedContactManager is used to manage which contacts are pinned to the taskbar. 
         // This class lets you pin and unpin contacts, determine whether a contact is pinned, 
@@ -96,7 +96,7 @@
         this.DeleteContactAnnotationsAsync = function (contact) {
             getAnnotationListAsync()
                 .then(function (annotationList) {
-                    return annotationList.findAnnotationsByRemoteIdAsync(contact.remoteId)
+                    return annotationList.findAnnotationsByRemoteIdAsync(contact.remoteId);
                 })
                 .then(function (contactAnnotations) {
                     var tasks = [];
