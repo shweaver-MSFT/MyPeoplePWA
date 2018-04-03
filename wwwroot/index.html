@@ -326,8 +326,9 @@
                     var selectedContacts = getSelectedContacts();
 
                     // Trim out the already pinned contacts
-                    while (selectedContacts.length > 0) {
-                        var sc = selectedContacts[selectedContacts.length - 1];
+                    var length = selectedContacts.length;
+                    for (var i = length - 1; i >= 0; i--) {
+                        var sc = selectedContacts[i];
                         if (viewModel.IsContactPinned(sc)) {
                             selectedContacts.pop();
                         }
