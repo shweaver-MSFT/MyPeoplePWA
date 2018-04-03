@@ -12,7 +12,7 @@
 
 
     <style>
-
+        /* Element styles */
         body {
             margin: 0;
             font-family: 'Segoe UI';
@@ -21,7 +21,6 @@
             color: #323232;
         }
 
-        /* Sample header */
         h1 {
             font-size: 28px;
             font-weight: bold;
@@ -29,7 +28,6 @@
             color: #E6E6E6;
         }
 
-        /* Section headers */
         h2 {
             font-size: 18px;
             font-weight: bold;
@@ -49,6 +47,19 @@
             padding: 0;
         }
 
+            button:disabled {
+                color: #F2F2F2;
+            }
+
+            button:hover {
+                color: #F2F2F2;
+                background-color: #323232;
+            }
+                button:disabled:hover {
+                    background-color: #CCCCCC;
+                }
+
+        /* Layout styles */
         .contentRoot {
             display: flex;
             flex-direction: column;
@@ -118,7 +129,7 @@
             }
 
         .contact {
-            width: 208px;
+            width: 216px;
             height: 64px;
             display: flex;
             flex-direction: row;
@@ -141,14 +152,30 @@
                 font-weight: 600; /* Semibold */
                 line-height: 21px;
                 font-size: 16px;
+                display: inline-block;
             }
 
+                .contact .contactDetails .pinIcon {
+                    font-family: 'Segoe UI Symbol';
+                    margin-left: 8px;
+                    cursor: pointer;
+                }
+
+            .contact.pinned .contactDetails .pinIcon:before {
+                content: "\E141";
+            }
+
+            .contact.pinned .contactDetails .pinIcon:hover:before {
+                content: "\E196";
+            }
+
+            .contact.selected {
+                background-color: #D8D8EB;
+            }
+
+        /* UI Templates should not be displayed */
         #templates {
             display: none;
-        }
-
-        .selected {
-            background-color: #D8D8EB;
         }
     </style>
 
@@ -178,12 +205,10 @@
 
             <div class="contactsPanel">
                 <h2>Contacts</h2>
-                <div class="contacts">
-                    
-                </div>
+                <div class="contacts"></div>
                 <div class="buttons">
-                    <button>Add to My People</button>
-                    <button>Show in People app</button>
+                    <button id="addToMyPeopleButton" disabled>Add to My People</button>
+                    <button id="showInPeopleAppButton" disabled>Show in People app</button>
                 </div>
             </div>
         </div>
@@ -194,7 +219,10 @@
         <div class="contact">
             <img class="contactImg" src="images/Contact.png" />
             <div class="contactDetails">
-                <div class="contactName"></div>
+                <div>
+                    <span class="contactName"></span>
+                    <span class="pinIcon"></span>
+                </div>
                 <div class="contactEmail"></div>
                 <div class="contactPhone"></div>
             </div>
@@ -223,8 +251,7 @@
                  * Generate fake contact data
                  */
                 function populateFakeContactsAsync() {
-                    // Create 3 fake contacts and add them using the contacts API.
-                    // Do not annotate them initially
+
                     function createContactAsync(first, last, email, phone, img) {
                         var contactsApi = Windows.ApplicationModel.Contacts;
 
@@ -245,7 +272,8 @@
 
                         //contact.thumbnail = "";
 
-                        return contacts.SaveContactAsync(contact);
+                        return contacts.SaveContactAsync(contact)
+                            .then(myPeople.AnnotateContactAsync(contact));
                     };
 
                     return Promise.all([
@@ -336,15 +364,33 @@
                 this.IsContactPinned = function (contact) {
                     return myPeople.IsContactPinned(contact);
                 }.bind(this);
+
+                this.TryLaunchPeopleAppAsync = function () {
+                    var peopleUri = new Windows.Foundation.Uri("ms-people:");
+                    return Windows.System.Launcher.launchUriAsync(peopleUri);
+                }
             };
 
             /* Main View */
             view = new function () {
 
-                var selectedContact = null;
+                var showInPeopleAppButton = document.querySelector("#showInPeopleAppButton");
+                var addToMyPeopleButton = document.querySelector("#addToMyPeopleButton");
+
+                var selectedContactItems = [];
+
+                function getContact(contactItem) {
+                    return viewModel.Contacts.find((v, i) => contactItem.getAttribute("data-contact-id") === v.id);
+                }
+
+                function getSelectedContacts() {
+                    var selectedContacts = [];
+                    selectedContactItems.forEach((v, i, a) => selectedContacts.push(getContact(v)));
+                    return selectedContacts;
+                }
 
                 /**
-                 * 
+                 * Add a contactItem to the UI
                  * @param contact
                  */
                 function addContact(contact) {
@@ -354,6 +400,7 @@
                     var contactName = contactTemplate.querySelector(".contactName");
                     var contactEmail = contactTemplate.querySelector(".contactEmail");
                     var contactPhone = contactTemplate.querySelector(".contactPhone");
+                    var contactPinIcon = contactTemplate.querySelector(".pinIcon");
 
                     //contactImg.src = contact.thumbnail;
                     contactName.innerHTML = contact.displayName;
@@ -361,22 +408,55 @@
                     contactPhone.innerHTML = contact.phones[0].number;
 
                     var isPinned = viewModel.IsContactPinned(contact);
-                    // TODO: Update pinned icon
+                    if (isPinned) {
+                        contactTemplate.classList.add("pinned");
+                    }
 
                     contactTemplate.setAttribute("data-contact-id", contact.id);
 
-                    contactTemplate.addEventListener("click", function onContactClick(e) {
+                    contactTemplate.addEventListener("click", function (e) {
+
                         var targetContact = e.currentTarget;
-                        if (selectedContact != targetContact) {
-                            if (selectedContact) {
-                                selectedContact.classList.remove("selected");
+
+                        if (e.target.classList.contains("pinIcon")) {// pin click
+
+                            e.target.disabled = true;
+
+                            if (targetContact.classList.contains("pinned")) {
+                                viewModel.UnpinContactAsync(contact)
+                                    .then(function () {
+                                        this.contact.classList.remove("pinned");
+                                        this.pinIcon.disabled = false;
+                                    }.bind({
+                                        "contact": targetContact,
+                                        "pinIcon": e.target
+                                    }));
                             }
-                            targetContact.classList.add("selected");
-                            selectedContact = targetContact;
+                            else {
+                                viewModel.PinContactAsync()
+                                    .then(function () {
+                                        this.contact.classList.add("pinned");
+                                        this.pinIcon.disabled = false;
+                                    }.bind({
+                                        "contact": targetContact,
+                                        "pinIcon": e.target
+                                    }));
+                            }
                         }
                         else {
-                            targetContact.classList.remove("selected");
-                            selectedContact = null;
+                            var selectedIndex = selectedContactItems.indexOf(targetContact);
+
+                            if (selectedIndex === -1) {
+                                targetContact.classList.add("selected");
+                                selectedContactItems.push(targetContact);
+                            }
+                            else {
+                                targetContact.classList.remove("selected");
+                                selectedContactItems.splice(selectedIndex, 1);
+                            }
+
+                            showInPeopleAppButton.disabled = selectedContactItems.length === 0;
+                            addToMyPeopleButton.disabled = selectedContactItems.length === 0;
                         }
                     });
 
@@ -389,7 +469,19 @@
                  * @param e
                  */
                 function onAddToMyPeopleClick(e) {
-                    
+
+                    if (!selectedContactItems || selectedContactItems.length === 0) {
+                        return;
+                    }
+
+                    addToMyPeopleButton.disabled = true;
+
+                    var selectedContacts = getSelectedContacts();
+                    viewModel.PinMultipleContactsAsync(selectedContacts)
+                        .then(function () {
+                            this.contactItems.forEach((v, i) => v.classList.add("pinned"));
+                            addToMyPeopleButton.disabled = false;
+                        }.bind({ contactItems: selectedContactItems }));
                 }
 
                 /**
@@ -397,7 +489,7 @@
                  * @param e
                  */
                 function onShowInPeopleAppClick(e) {
-
+                    viewModel.TryLaunchPeopleAppAsync();
                 }
 
                 // Init
@@ -406,12 +498,10 @@
                         for (i = 0; i < viewModel.Contacts.length; i++) {
                             addContact(viewModel.Contacts[i]);
                         }
-                    })
-                    .then(function () {
 
-                    });;
-
-
+                        showInPeopleAppButton.addEventListener("click", onShowInPeopleAppClick);
+                        addToMyPeopleButton.addEventListener("click", onAddToMyPeopleClick);
+                    });
             }();
         })();
     </script>

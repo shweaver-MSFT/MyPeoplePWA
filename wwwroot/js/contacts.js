@@ -7,6 +7,11 @@
         var contactStore = null;
 
         function getContactStoreAsync() {
+            if (!window.Windows) {
+                logger.Log("Contacts API is not supported on web");
+                return;
+            }
+
             var contacts = Windows.ApplicationModel.Contacts;
 
             if (contactStore == null) {
@@ -54,26 +59,6 @@
         // Your application must also write an annotation to each contact. 
         // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#annotating-contacts
         this.SaveContactAsync = function (contact) {
-
-            var contacts = Windows.ApplicationModel.Contacts;
-
-            //var contact = new contacts.Contact();
-            //contact.firstName = first;
-            //contact.lastName = last;
-
-            //// Use a unique value as the remoteId that we can key on later
-            //contact.remoteId = email;
-
-            //var contactEmail = new contacts.ContactEmail();
-            //contactEmail.address = email;
-            //contact.emails.append(contactEmail);
-
-            //var contactPhone = new contacts.ContactPhone();
-            //contactPhone.number = phone;
-            //contact.phones.append(contactPhone);
-
-            ////contact.thumbnail = "";
-
             return getContactListAsync()
                 .then(function onSuccess(contactList) {
                     return contactList.saveContactAsync(contact);

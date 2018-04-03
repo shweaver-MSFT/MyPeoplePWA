@@ -12,6 +12,11 @@
          * 
          */
         function getAnnotationStoreAsync() {
+            if (!window.Windows) {
+                logger.Log("MyPeople is not supported on web");
+                return;
+            }
+
             var contacts = Windows.ApplicationModel.Contacts;
 
             if (annotationStore == null) {
@@ -51,6 +56,11 @@
         // You can retrieve the PinnedContactManager object using the GetDefault method:
         // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#the-pinnedcontactmanager-class
         function getPinnedContactManager() {
+            if (!window.Windows) {
+                logger.Log("MyPeople is not supported on web");
+                return;
+            }
+
             return Windows.ApplicationModel.Contacts.PinnedContactManager.getDefault();
         }
 
