@@ -4,181 +4,9 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <title>MyPeople PWA</title>
+    <title>My People - Progressive web app samples</title>
 
-    <!--<link href="css/global.css" rel="stylesheet">-->
-
-
-    <style>
-        /* Element styles */
-        body {
-            margin: 0;
-            font-family: 'Segoe UI';
-            font-size: 10px;
-            line-height: 14px;
-            color: #323232;
-        }
-
-        h1 {
-            font-size: 28px;
-            font-weight: bold;
-            line-height: 37px;
-            color: #E6E6E6;
-        }
-
-        h2 {
-            font-size: 18px;
-            font-weight: bold;
-            line-height: 24px;
-        }
-
-        button {
-            height: 24px;
-            width: 96px;
-            background-color: #CCCCCC;
-            margin-left: 8px;
-            font-family: 'Segoe UI';
-            font-size: 10px;
-            line-height: 14px;
-            color: #323232;
-            border: 0;
-            padding: 0;
-        }
-
-            button:disabled {
-                color: #F2F2F2;
-            }
-
-            button:hover {
-                color: #F2F2F2;
-                background-color: #323232;
-            }
-                button:disabled:hover {
-                    background-color: #CCCCCC;
-                }
-
-        /* Layout styles */
-        .contentRoot {
-            display: flex;
-            flex-direction: column;
-            min-height: 100%;
-            position: absolute;
-        }
-
-            .contentRoot > div {
-                flex: 1;
-            }
-
-        .headerPanel {
-            background-image: url(images/background.jpg);
-            background-size: cover;
-            background-position-y: center;
-            background-position-x: center;
-            min-height: 152px;
-            min-width: 704px;
-            position: relative;
-        }
-
-            .headerPanel h1 {
-                position: absolute;
-                bottom: 0;
-                margin: 8px 16px;
-            }
-
-        .contentPanel {
-            display: flex;
-            flex-direction: row;
-        }
-
-            .contentPanel > div {
-                flex: 1;
-                width: 50%;
-            }
-
-            .contentPanel h2 {
-                margin-left: 16px;
-                margin-top: 11px;
-                margin-bottom: 0px;
-            }
-
-        .descriptionPanel {
-            width: 50%;
-            background-color: #F2F2F2;
-        }
-
-            .descriptionPanel p {
-                margin: 13px 16px;
-            }
-
-        .contactsPanel {
-            background-color: #E6E6E6;
-        }
-
-            .contactsPanel > div {
-                margin-left: 8px;
-            }
-
-            .contactsPanel .contacts {
-                margin-top: 5px;
-            }
-
-            .contactsPanel .buttons {
-                margin-top: 32px;
-            }
-
-        .contact {
-            width: 216px;
-            height: 64px;
-            display: flex;
-            flex-direction: row;
-        }
-
-            .contact img {
-                width: 48px;
-                height: 48px;
-                border-radius: 50%;
-                margin: 8px;
-            }
-
-            .contact .contactDetails {
-                margin: 8px 0px;
-                display: flex;
-                flex-direction: column;
-            }
-
-            .contact .contactDetails .contactName {
-                font-weight: 600; /* Semibold */
-                line-height: 21px;
-                font-size: 16px;
-                display: inline-block;
-            }
-
-                .contact .contactDetails .pinIcon {
-                    font-family: 'Segoe UI Symbol';
-                    margin-left: 8px;
-                    cursor: pointer;
-                }
-
-            .contact.pinned .contactDetails .pinIcon:before {
-                content: "\E141";
-            }
-
-            .contact.pinned .contactDetails .pinIcon:hover:before {
-                content: "\E196";
-            }
-
-            .contact.selected {
-                background-color: #D8D8EB;
-            }
-
-        /* UI Templates should not be displayed */
-        #templates {
-            display: none;
-        }
-    </style>
-
+    <link href="css/global.css" rel="stylesheet">
 </head>
 
 <body>
@@ -250,41 +78,111 @@
                 /**
                  * Generate fake contact data
                  */
-                function populateFakeContactsAsync() {
-
-                    function createContactAsync(first, last, email, phone, img) {
-                        var contactsApi = Windows.ApplicationModel.Contacts;
-
-                        var contact = new contactsApi.Contact();
-                        contact.firstName = first;
-                        contact.lastName = last;
-
-                        // Use a unique value as the remoteId that we can key on later
-                        contact.remoteId = email;
-
-                        var contactEmail = new contactsApi.ContactEmail();
-                        contactEmail.address = email;
-                        contact.emails.append(contactEmail);
-
-                        var contactPhone = new contactsApi.ContactPhone();
-                        contactPhone.number = phone;
-                        contact.phones.append(contactPhone);
-
-                        //contact.thumbnail = "";
-
-                        return contacts.SaveContactAsync(contact)
-                            .then(myPeople.AnnotateContactAsync(contact));
-                    };
-
+                var populateFakeContactsAsync = function () {
                     return Promise.all([
-                        createContactAsync("Kim", "Abercrombie", "kim@contoso.com", "206-555-1234", "images/contact1.png"),
-                        createContactAsync("Tom", "Perham", "tom@contoso.com", "425-555-4433", "images/contact2.png"),
-                        createContactAsync("Hermes", "Galanos", "hermes@contoso.com", "206-555-7712", "images/contact3.png")
+                        this.CreateNewContactAsync("Kim", "Abercrombie", "kim@contoso.com", "206-555-1234", "/images/contact1.jpg"),
+                        this.CreateNewContactAsync("Tom", "Perham", "tom@contoso.com", "425-555-4433", "/images/contact2.jpg"),
+                        this.CreateNewContactAsync("Hermes", "Galanos", "hermes@contoso.com", "206-555-7712", "/images/contact3.jpg")
                     ]);
+                }.bind(this);
+
+                /**
+                 * Create a new Contact and annotate it
+                 **/
+                this.CreateNewContactAsync = function (first, last, email, phone, img) {
+                    var contactsApi = Windows.ApplicationModel.Contacts;
+
+                    var contact = new contactsApi.Contact();
+                    contact.firstName = first;
+                    contact.lastName = last;
+
+                    // Use a unique value as the remoteId that we can key on later
+                    contact.remoteId = email;
+
+                    var contactEmail = new contactsApi.ContactEmail();
+                    contactEmail.address = email;
+                    contact.emails.append(contactEmail);
+
+                    var contactPhone = new contactsApi.ContactPhone();
+                    contactPhone.number = phone;
+                    contact.phones.append(contactPhone);
+
+                    var thumbnail = Windows.Storage.Streams.RandomAccessStreamReference.createFromUri(new Windows.Foundation.Uri("ms-appx-web://" + img));
+                    contact.thumbnail = thumbnail;
+
+                    return contacts.SaveContactAsync(contact)
+                        .then(myPeople.AnnotateContactAsync(contact));
+                }.bind(this);
+
+                /**
+                 * Delete a contact and its annotations
+                 **/
+                this.DeleteContactAsync = function (contact) {
+                    return contacts.DeleteContactAsync(contact)
+                        .then(function () {
+                            logger.Log("Contact Deleted");
+                            var i = this.Contacts.indexOf(contact);
+                            if (i != -1) {
+                                this.Contacts.splice(i, 1);
+                            }
+                            return myPeople.DeleteContactAnnotationsAsync(contact)
+                        }.bind(this))
+                        .then(function () {
+                            logger.Log("Contact Annotations Deleted");
+                            return Promise.resolve();
+                        }.bind(this));
+                }.bind(this);
+
+                /**
+                 * Pin a contact to the taskbar
+                 **/
+                this.PinContactAsync = function (contact) {
+                    return myPeople.PinContactAsync(contact)
+                        .then(function () {
+                            logger.Log("Contact Pinned to Taskbar");
+                            return Promise.resolve();
+                        });
+                }.bind(this);
+
+                /**
+                 * Unpin a contact from the taskbar
+                 **/
+                this.UnpinContactAsync = function (contact) {
+                    return myPeople.UnpinContactAsync(contact)
+                        .then(function () {
+                            logger.Log("Contact Unpinned from Taskbar");
+                            return Promise.resolve();
+                        });
+                }.bind(this);
+
+                /**
+                 * Pin multiple contacts to the taskbar
+                 **/
+                this.PinMultipleContactsAsync = function (contacts) {
+                    return myPeople.PinMultipleContactsAsync(contacts)
+                        .then(function () {
+                            logger.Log("Contacts Pinned to Taskbar");
+                            return Promise.resolve();
+                        });
+                }.bind(this);
+
+                /**
+                 * Check if a contact is pinned or not
+                 **/
+                this.IsContactPinned = function (contact) {
+                    return myPeople.IsContactPinned(contact);
+                }.bind(this);
+
+                /**
+                 * Launch the People app to show the contacts integration
+                 **/
+                this.TryLaunchPeopleAppAsync = function () {
+                    var peopleUri = new Windows.Foundation.Uri("ms-people:");
+                    return Windows.System.Launcher.launchUriAsync(peopleUri);
                 }
 
                 /**
-                 * 
+                 * Initialize the ViewModel. Get any known contacts, if none make some fake ones.
                  */
                 this.InitializeAsync = function () {
                     return contacts.GetContactsAsync()
@@ -298,77 +196,6 @@
                             return Promise.resolve()
                         }.bind(this));
                 }
-
-                //this.CreateNewContactAsync = function (first, last, email, phone) {
-                //    var currentContact;
-                //    return contacts.CreateContactAsync(first, last, email, phone)
-                //        .then(function (contact) {
-                //            currentContact = contact;
-                //            this.Contacts.push(contact);
-                //            return myPeople.AnnotateContactAsync(contact);
-                //        }.bind(this))
-                //        .then(function (annotation) {
-                //            logger.Log("New Contact Created and Annotated");
-                //            return Promise.resolve(currentContact);
-                //        }.bind(this));
-                //}.bind(this);
-
-                //this.DeleteContactAsync = function (contact) {
-                //    return contacts.DeleteContactAsync(contact)
-                //        .then(function () {
-                //            logger.Log("Contact Deleted");
-                //            var i = this.Contacts.indexOf(contact);
-                //            if (i != -1) {
-                //                this.Contacts.splice(i, 1);
-                //            }
-                //            return myPeople.DeleteContactAnnotationsAsync(contact)
-                //        }.bind(this))
-                //        .then(function () {
-                //            logger.Log("Contact Annotations Deleted");
-                //            return Promise.resolve();
-                //        }.bind(this));
-                //}.bind(this);
-
-                this.PinContactAsync = function (contact) {
-                    return myPeople.PinContactAsync(contact)
-                        .then(function () {
-                            logger.Log("Contact Pinned to Taskbar");
-                            return Promise.resolve();
-                        });
-                }.bind(this);
-
-                this.UnpinContactAsync = function (contact) {
-                    return myPeople.UnpinContactAsync(contact)
-                        .then(function () {
-                            logger.Log("Contact Unpinned from Taskbar");
-                            return Promise.resolve();
-                        });
-                }.bind(this);
-
-                this.PinMultipleContactsAsync = function (contacts) {
-                    return myPeople.PinMultipleContactsAsync(contacts)
-                        .then(function () {
-                            logger.Log("Contacts Pinned to Taskbar");
-                            return Promise.resolve();
-                        });
-                }.bind(this);
-
-                this.UpdateContactAsync = function (contact) {
-                    return contacts.UpdateContactAsync(contacts)
-                        .then(function () {
-                            logger.Log("Contacts Pinned to Taskbar");
-                            return Promise.resolve();
-                        });
-                }.bind(this);
-
-                this.IsContactPinned = function (contact) {
-                    return myPeople.IsContactPinned(contact);
-                }.bind(this);
-
-                this.TryLaunchPeopleAppAsync = function () {
-                    var peopleUri = new Windows.Foundation.Uri("ms-people:");
-                    return Windows.System.Launcher.launchUriAsync(peopleUri);
-                }
             };
 
             /* Main View */
@@ -379,10 +206,12 @@
 
                 var selectedContactItems = [];
 
+                // Get a contact by template
                 function getContact(contactItem) {
                     return viewModel.Contacts.find((v, i) => contactItem.getAttribute("data-contact-id") === v.id);
                 }
 
+                // Get the selected contacts
                 function getSelectedContacts() {
                     var selectedContacts = [];
                     selectedContactItems.forEach((v, i, a) => selectedContacts.push(getContact(v)));
@@ -394,35 +223,51 @@
                  * @param contact
                  */
                 function addContact(contact) {
-                    var contactTemplate = document.querySelector("#templates .contact").cloneNode(true);
 
+                    var contactTemplate = document.querySelector("#templates .contact").cloneNode(true);
                     var contactImg = contactTemplate.querySelector(".contactImg");
                     var contactName = contactTemplate.querySelector(".contactName");
                     var contactEmail = contactTemplate.querySelector(".contactEmail");
                     var contactPhone = contactTemplate.querySelector(".contactPhone");
                     var contactPinIcon = contactTemplate.querySelector(".pinIcon");
 
-                    //contactImg.src = contact.thumbnail;
+                    if (contact.thumbnail != null) {
+                        contactImg.src = contact.thumbnail;
+                    }
+                    else {
+                        // This hack handles when the thumbnail is null.
+                        // There are 3 fake contacts with images available for each (/images/contact1.jpg, etc.)
+                        if (!this.hack) {
+                            this.hack = 0;
+                        }
+                        contactImg.src = "/images/contact" + ++this.hack + ".jpg"
+                    }
+
                     contactName.innerHTML = contact.displayName;
                     contactEmail.innerHTML = contact.emails[0].address;
                     contactPhone.innerHTML = contact.phones[0].number;
 
+                    // Update the pinned status
                     var isPinned = viewModel.IsContactPinned(contact);
                     if (isPinned) {
                         contactTemplate.classList.add("pinned");
                     }
 
+                    // Add the contactId to the element for lookup
                     contactTemplate.setAttribute("data-contact-id", contact.id);
 
+                    // Wire up the click handler
                     contactTemplate.addEventListener("click", function (e) {
 
                         var targetContact = e.currentTarget;
 
-                        if (e.target.classList.contains("pinIcon")) {// pin click
+                        // Handle pin click
+                        if (e.target.classList.contains("pinIcon")) {
 
                             e.target.disabled = true;
 
                             if (targetContact.classList.contains("pinned")) {
+                                // Unpin the contact
                                 viewModel.UnpinContactAsync(contact)
                                     .then(function () {
                                         this.contact.classList.remove("pinned");
@@ -433,6 +278,7 @@
                                     }));
                             }
                             else {
+                                // Pin the contact
                                 viewModel.PinContactAsync()
                                     .then(function () {
                                         this.contact.classList.add("pinned");
@@ -443,6 +289,7 @@
                                     }));
                             }
                         }
+                        // Handle other contact click
                         else {
                             var selectedIndex = selectedContactItems.indexOf(targetContact);
 
@@ -465,7 +312,7 @@
                 }
 
                 /**
-                 * Annotates a contact
+                 * Pin contacts to the taskbar
                  * @param e
                  */
                 function onAddToMyPeopleClick(e) {
@@ -477,6 +324,20 @@
                     addToMyPeopleButton.disabled = true;
 
                     var selectedContacts = getSelectedContacts();
+
+                    // Trim out the already pinned contacts
+                    while (selectedContacts.length > 0) {
+                        var sc = selectedContacts[selectedContacts.length - 1];
+                        if (viewModel.IsContactPinned(sc)) {
+                            selectedContacts.pop();
+                        }
+                    }
+
+                    if (selectedContacts.length === 0) {
+                        return;
+                    }
+
+                    // Pin the rest
                     viewModel.PinMultipleContactsAsync(selectedContacts)
                         .then(function () {
                             this.contactItems.forEach((v, i) => v.classList.add("pinned"));
@@ -485,7 +346,7 @@
                 }
 
                 /**
-                 * 
+                 * Launch the People app
                  * @param e
                  */
                 function onShowInPeopleAppClick(e) {

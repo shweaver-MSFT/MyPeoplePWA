@@ -1,102 +1,166 @@
-﻿#contentRoot {
+﻿/* Element styles */
+body {
+    margin: 0;
     font-family: 'Segoe UI';
-    width: 100%;
-    height: 100%;
-    text-align: center;
+    font-size: 10px;
+    line-height: 14px;
+    color: #323232;
 }
 
-#headerPanel {
+h1 {
+    font-size: 28px;
+    font-weight: bold;
+    line-height: 37px;
+    color: #E6E6E6;
+}
+
+h2 {
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 24px;
+}
+
+button {
+    height: 24px;
+    width: 96px;
+    background-color: #CCCCCC;
+    margin-left: 8px;
+    font-family: 'Segoe UI';
+    font-size: 10px;
+    line-height: 14px;
+    color: #323232;
+    border: 0;
+    padding: 0;
+}
+
+    button:disabled {
+        color: #F2F2F2;
+    }
+
+    button:hover {
+        color: #F2F2F2;
+        background-color: #323232;
+    }
+
+    button:disabled:hover {
+        background-color: #CCCCCC;
+    }
+
+/* Layout styles */
+.contentRoot {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
     position: absolute;
-    left: 12px;
-    top: 12px;
-    font-size: 20pt;
 }
 
-/* New or Edit Current Contact Panel */
-#currentContactPanel {
-    margin-top: 48px;
-    margin-bottom: 48px;
-    display: inline-block;
-    text-align: left;
+    .contentRoot > div {
+        flex: 1;
+    }
+
+.headerPanel {
+    background-image: url(../images/background.jpg);
+    background-size: cover;
+    background-position-y: center;
+    background-position-x: center;
+    min-height: 152px;
+    min-width: 704px;
+    position: relative;
 }
 
-    #currentContactPanel #contentWrapper {
-        border: 1px solid black;
+    .headerPanel h1 {
+        position: absolute;
+        bottom: 0;
+        margin: 8px 16px;
     }
 
-    #currentContactPanel #newOrEditIndicator {
-        width: 100%;
+.contentPanel {
+    display: flex;
+    flex-direction: row;
+}
+
+    .contentPanel > div {
+        flex: 1;
+        width: 50%;
     }
 
-    #currentContactPanel #contactPicPanel {
-        display: inline-block;
-        width: 100px;
-        height: 100px;
+    .contentPanel h2 {
+        margin-left: 16px;
+        margin-top: 11px;
+        margin-bottom: 0px;
     }
 
-    #currentContactPanel #contactDetailsPanel {
-        display: inline-block;
+.descriptionPanel {
+    width: 50%;
+    background-color: #F2F2F2;
+}
+
+    .descriptionPanel p {
+        margin: 13px 16px;
     }
 
-        #currentContactPanel #contactDetailsPanel #contactName div {
+.contactsPanel {
+    background-color: #E6E6E6;
+}
+
+    .contactsPanel > div {
+        margin-left: 8px;
+    }
+
+    .contactsPanel .contacts {
+        margin-top: 5px;
+    }
+
+    .contactsPanel .buttons {
+        margin-top: 32px;
+    }
+
+.contact {
+    width: 224px;
+    height: 64px;
+    display: flex;
+    flex-direction: row;
+}
+
+    .contact img {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        margin: 8px;
+    }
+
+    .contact .contactDetails {
+        margin: 8px 0px;
+        display: flex;
+        flex-direction: column;
+    }
+
+        .contact .contactDetails .contactName {
+            font-weight: 600; /* Semibold */
+            line-height: 21px;
+            font-size: 16px;
             display: inline-block;
         }
 
-/* Contact Commands Panel */
-#contactCommandsPanel {
-    display: inline-block;
-    width: 90vw;
-    text-align: center;
-}
-
-    #contactCommandsPanel div {
-        display: inline-block;
-    }
-
-    #contactCommandsPanel #contactOptionsPanel {
-        float: left;
-    }
-
-    #contactCommandsPanel #contactSelectionOptionsPanel {
-    }
-
-    #contactCommandsPanel #contactCollectionOptionsPanel {
-        float: right;
-    }
-
-/* Contact Collection Panel */
-#contactCollectionPanel {
-    width: 90vw;
-    height: auto;
-    display: inline-block;
-}
-
-    #contactCollectionPanel #contactCollectionEmptyState {
-    }
-
-    #contactCollectionPanel #contactCollectionContent #contactTemplate {
-        display: inline-block;
-        width: 200px;
-        height: 250px;
-        text-align: center;
-        margin: 4px;
-        padding: 12px;
-        background-color: transparent;
-    }
-
-        #contactCollectionPanel #contactCollectionContent #contactTemplate.selected {
-            background-color: lightgray;
+        .contact .contactDetails .pinIcon {
+            font-family: 'Segoe UI Symbol';
+            margin-left: 8px;
+            cursor: pointer;
         }
 
-        #contactCollectionPanel #contactCollectionContent #contactTemplate.focused {
-            border: 3px solid black;
-            margin: -3px;
-        }
+    .contact.pinned .contactDetails .pinIcon:before {
+        content: "\E141";
+    }
 
-.hidden {
+    .contact.pinned .contactDetails .pinIcon:hover:before {
+        content: "\E196";
+    }
+
+    .contact.selected {
+        background-color: #D8D8EB;
+    }
+
+/* UI Templates should not be displayed */
+#templates {
     display: none;
-}
-
-.error {
-    border-color: red;
 }

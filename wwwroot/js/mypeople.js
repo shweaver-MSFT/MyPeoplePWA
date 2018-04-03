@@ -8,9 +8,7 @@
         var registeredContactPanel = null;
         var annotationStore = null;
 
-        /**
-         * 
-         */
+        // Get the annotation store
         function getAnnotationStoreAsync() {
             if (!window.Windows) {
                 logger.Log("MyPeople is not supported on web");
@@ -31,9 +29,7 @@
             }
         }
 
-        /**
-         * 
-         */
+        // Get the annotation list
         function getAnnotationListAsync() {
 
             return getAnnotationStoreAsync()
@@ -77,12 +73,12 @@
 
             getAnnotationListAsync()
                 .then(function (annotationList) {
-
                     var contacts = Windows.ApplicationModel.Contacts;
 
                     var annotation = new contacts.ContactAnnotation();
-                    annotation.contactId = contact.id;
-                    annotation.remoteId = contact.remoteId;
+                    annotation.contactId = this.contact.id;
+                    annotation.remoteId = this.contact.remoteId;
+                    annotation.contactListId = this.contact.contactListId;
                     annotation.supportedOperations = contacts.ContactAnnotationOperations.contactProfile | contacts.ContactAnnotationOperations.share;
 
                     var appId = app.AppId;
@@ -93,10 +89,10 @@
                         .then(function () {
                             return Promise.resolve(annotation);
                         });
-                });
+                }.bind({ "contact": contact }));
         }.bind(this);
 
-        //
+        // Delete a contact's annotations
         this.DeleteContactAnnotationsAsync = function (contact) {
             getAnnotationListAsync()
                 .then(function (annotationList) {

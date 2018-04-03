@@ -6,6 +6,7 @@
 
         var contactStore = null;
 
+        // Get the contact store
         function getContactStoreAsync() {
             if (!window.Windows) {
                 logger.Log("Contacts API is not supported on web");
@@ -26,6 +27,7 @@
             }
         }
 
+        // Get the contact list
         function getContactListAsync() {
 
             return getContactStoreAsync()
@@ -42,7 +44,7 @@
                 });
         };
 
-        //
+        // Get the contacts from the contactList
         this.GetContactsAsync = function () {
             return getContactListAsync()
                 .then(function (contactList) {
@@ -68,7 +70,7 @@
                 });
         }.bind(this);
 
-        // 
+        // Delete a contact
         this.DeleteContactAsync = function (contact) {
             return getContactListAsync()
                 .then(function (contactList) {
