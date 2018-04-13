@@ -77,8 +77,8 @@
 
                     var annotation = new contacts.ContactAnnotation();
                     annotation.contactId = this.contact.id;
-                    annotation.remoteId = this.contact.remoteId;
                     annotation.contactListId = this.contact.contactListId;
+                    annotation.remoteId = this.contact.remoteId;
                     annotation.supportedOperations = contacts.ContactAnnotationOperations.contactProfile | contacts.ContactAnnotationOperations.share;
 
                     var appId = app.AppId;

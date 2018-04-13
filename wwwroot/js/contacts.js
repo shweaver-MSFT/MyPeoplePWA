@@ -15,7 +15,7 @@
 
             var contacts = Windows.ApplicationModel.Contacts;
 
-            if (contactStore == null) {
+            if (!contactStore) {
                 return contacts.ContactManager.requestStoreAsync(contacts.ContactStoreAccessType.appContactsReadWrite)
                     .then(function (e) {
                         contactStore = e;
@@ -35,14 +35,14 @@
                     return contactStore.findContactListsAsync();
                 })
                 .then(function (contactLists) {
-                    if (!contactLists || contactLists.length == 0) {
+                    if (!contactLists || contactLists.length === 0) {
                         return contactStore.createContactListAsync("MyPeoplePWAContactList");
                     }
                     else {
                         return Promise.resolve(contactLists[0]);
                     }
                 });
-        };
+        }
 
         // Get the contacts from the contactList
         this.GetContactsAsync = function () {
@@ -75,7 +75,7 @@
             return getContactListAsync()
                 .then(function (contactList) {
                     return contactList.deleteContactAsync(contact);
-                })
+                });
         }.bind(this);
     };
 
