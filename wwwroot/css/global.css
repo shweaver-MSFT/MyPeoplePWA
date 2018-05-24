@@ -116,11 +116,17 @@ button {
     }
 
 .contact {
-    width: 224px;
-    height: 64px;
+    width: 222px;
+    height: 62px;
     display: flex;
     flex-direction: row;
+    border: 1px solid #E6E6E6;
+    margin-bottom: 2px;
 }
+
+    .contact:hover {
+        border-color: #CCCCCC;
+    }
 
     .contact img {
         width: 48px;

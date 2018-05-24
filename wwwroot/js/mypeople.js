@@ -75,6 +75,8 @@
                 .then(function (annotationList) {
                     var contacts = Windows.ApplicationModel.Contacts;
 
+                    // ERROR: The below code fails to add the id properties to the annotation object for some reason,
+                    // which causes the following call to trySaveAnnotationAsync to fail as well.
                     var annotation = new contacts.ContactAnnotation();
                     annotation.contactId = this.contact.id;
                     annotation.contactListId = this.contact.contactListId;
@@ -85,6 +87,7 @@
                     annotation.providerProperties.insert("ContactPanelAppID", appId);
                     annotation.providerProperties.insert("ContactShareAppID", appId);
 
+                    // ERROR: The call to trySaveAnnotationAsync will fail if the Annotation is missing values.
                     return annotationList.trySaveAnnotationAsync(annotation)
                         .then(function () {
                             return Promise.resolve(annotation);

@@ -11,7 +11,7 @@
 
             var activation = Windows.ApplicationModel.Activation;
 
-            if (args && (args.previousExecutionState == activation.ApplicationExecutionState.terminated || args.previousExecutionState == activation.ApplicationExecutionState.closedByUser)) {
+            if (args && (args.previousExecutionState === activation.ApplicationExecutionState.terminated || args.previousExecutionState === activation.ApplicationExecutionState.closedByUser)) {
                 // TODO: Populate the UI with the previously saved application data
             }
             else {
@@ -25,7 +25,7 @@
 
             var protocol = args.Uri.absoluteUri;
             // TODO: Handle protocol activation
-        };
+        }
 
         // Handle shareTarget activation
         function onShareTargetActivated(args) {
@@ -62,7 +62,7 @@
                 return;
             }
 
-            if (args && args.kind != undefined) {
+            if (args && args.kind !== undefined) {
 
                 var activation = Windows.ApplicationModel.Activation;
 
@@ -92,7 +92,7 @@
                         // URI launch failed
                     }
                 });
-        }
+        };
     };
 
     var activationService = new ActivationService();
