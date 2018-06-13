@@ -101,10 +101,10 @@
     // Register for activation
     if (window.Windows && window.Windows.UI && window.Windows.UI.WebUI) {
         try {
-            Windows.UI.WebUI.WebUIApplication.addEventListener("activated", activationService.OnActivated);
+            Windows.UI.WebUI.WebUIApplication.onactivated = activationService.OnActivated;
         }
         catch (e) {
-            WebUIApplication.addEventListener("onactivated", activationService.OnActivated);
+            WebUIApplication.onactivated = activationService.OnActivated;
         }
     }
     else {
