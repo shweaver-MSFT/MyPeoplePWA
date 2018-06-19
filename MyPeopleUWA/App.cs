@@ -11,7 +11,6 @@ namespace MyPeopleUWA
         static void Main(string[] args)
         {
             // Transfer all Web content to local cache folder.
-            // TODO: Consider clearing the cache first. May not be necessary
             var webFolder = Package.Current.InstalledLocation.GetFolderAsync("Web").GetAwaiter().GetResult();
             var destinationFolder = ApplicationData.Current.LocalCacheFolder;
             RecursiveCopy(webFolder, destinationFolder).GetAwaiter().GetResult();
@@ -19,7 +18,7 @@ namespace MyPeopleUWA
             Start(_ => new App());
         }
 
-        public App() : base(new Uri("Web/index.html")) { }
+        public App() : base(new Uri("ms-appdata:///LocalCache/Web/index.html")) { } // ms-appx-web:///Web/index.html
 
         private static async Task RecursiveCopy(IStorageItem storageItem, IStorageFolder destinationFolder)
         {
@@ -34,7 +33,7 @@ namespace MyPeopleUWA
             }
             else if (storageItem is StorageFile)
             {
-                await (storageItem as StorageFile).CopyAsync(destinationFolder, storageItem.Name, NameCollisionOption.ReplaceExisting);
+                var ignore = await (storageItem as StorageFile).CopyAsync(destinationFolder, storageItem.Name, NameCollisionOption.ReplaceExisting);
             }
         }
     }
