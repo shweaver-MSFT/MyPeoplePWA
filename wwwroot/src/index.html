@@ -107,11 +107,17 @@
                     contactPhone.number = phone;
                     contact.phones.append(contactPhone);
 
-                    var thumbnail = Windows.Storage.Streams.RandomAccessStreamReference.createFromUri(new Windows.Foundation.Uri("ms-appx-web://" + img));
-                    contact.thumbnail = thumbnail;
+                    return window.webUIApplication.getStreamFromUriAsync("ms-appx:///Web" + img).then(function (thumbnail) {
 
-                    return contacts.SaveContactAsync(contact)
-                        .then(myPeople.AnnotateContactAsync(contact));
+                        //todo: what format is this supposed to be in b/c nothing works.
+
+                        //var messageDialog = new Windows.UI.Popups.MessageDialog(thumbnail === null ? "null" : "not null", "Alert");
+                        //messageDialog.showAsync();
+                        contact.thumbnail = null; //thumbnail;
+
+                    }).then(
+                        contacts.SaveContactAsync(contact)
+                        .then(myPeople.AnnotateContactAsync(contact)));
                 }.bind(this);
 
                 /**
@@ -125,7 +131,7 @@
                             if (i != -1) {
                                 this.Contacts.splice(i, 1);
                             }
-                            return myPeople.DeleteContactAnnotationsAsync(contact)
+                            return myPeople.DeleteContactAnnotationsAsync(contact);
                         }.bind(this))
                         .then(function () {
                             logger.Log("Contact Annotations Deleted");
@@ -231,7 +237,10 @@
                     var contactPhone = contactTemplate.querySelector(".contactPhone");
                     var contactPinIcon = contactTemplate.querySelector(".pinIcon");
 
-                    if (contact.thumbnail != null) {
+                    if (contact.thumbnail !== null) {
+                        var messageDialog = new Windows.UI.Popups.MessageDialog("123", "Alert");
+                        messageDialog.showAsync();
+
                         contactImg.src = contact.thumbnail;
                     }
                     else {
@@ -240,7 +249,7 @@
                         if (!this.hack) {
                             this.hack = 0;
                         }
-                        contactImg.src = "/images/contact" + ++this.hack + ".jpg"
+                        contactImg.src = "ms-appx-web:///Web/images/contact" + ++this.hack + ".jpg";
                     }
 
                     contactName.innerHTML = contact.displayName;

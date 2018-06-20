@@ -18,7 +18,7 @@ namespace MyPeopleUWA
             Start(_ => new App());
         }
 
-        public App() : base(new Uri("ms-appx:///Web/index.html")) { } // ms-appx-web:///Web/index.html
+        public App() : base(new Uri("ms-appx-web:///Web/index.html")) { } //(doesn't really matter what this is) // ms-appx-web:///Web/index.html
 
         private static async Task RecursiveCopy(IStorageItem storageItem, IStorageFolder destinationFolder)
         {
