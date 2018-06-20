@@ -92,8 +92,76 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="../wwwroot/src/**/*.*">
-      <Link>Web/%(RecursiveDir)%(FileName)%(Extension)</Link>
+    <Content Include="..\wwwroot\src\css\global.css">
+      <Link>Web/css\global.css</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\wwwroot\src\images\background.jpg">
+      <Link>Web/images\background.jpg</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\wwwroot\src\images\contact1.jpg">
+      <Link>Web/images\contact1.jpg</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\wwwroot\src\images\contact2.jpg">
+      <Link>Web/images\contact2.jpg</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\wwwroot\src\images\contact3.jpg">
+      <Link>Web/images\contact3.jpg</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\wwwroot\src\images\LockScreenLogo.scale-200.png">
+      <Link>Web/images\LockScreenLogo.scale-200.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\wwwroot\src\images\SplashScreen.scale-200.png">
+      <Link>Web/images\SplashScreen.scale-200.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\wwwroot\src\images\Square150x150Logo.scale-200.png">
+      <Link>Web/images\Square150x150Logo.scale-200.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\wwwroot\src\images\Square44x44Logo.scale-200.png">
+      <Link>Web/images\Square44x44Logo.scale-200.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\wwwroot\src\images\Square44x44Logo.targetsize-24_altform-unplated.png">
+      <Link>Web/images\Square44x44Logo.targetsize-24_altform-unplated.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\wwwroot\src\images\StoreLogo.png">
+      <Link>Web/images\StoreLogo.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\wwwroot\src\images\Wide310x150Logo.scale-200.png">
+      <Link>Web/images\Wide310x150Logo.scale-200.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\wwwroot\src\index.html">
+      <Link>Web/index.html</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\wwwroot\src\js\activation.js">
+      <Link>Web/js\activation.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\wwwroot\src\js\app.js">
+      <Link>Web/js\app.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\wwwroot\src\js\contacts.js">
+      <Link>Web/js\contacts.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\wwwroot\src\js\logger.js">
+      <Link>Web/js\logger.js</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\wwwroot\src\js\mypeople.js">
+      <Link>Web/js\mypeople.js</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
