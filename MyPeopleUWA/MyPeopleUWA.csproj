@@ -93,7 +93,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="../wwwroot/src/**/*.*">
-      <Link>Web/%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <Link>%(RecursiveDir)%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

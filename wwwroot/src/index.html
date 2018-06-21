@@ -107,7 +107,7 @@
                     contactPhone.number = phone;
                     contact.phones.append(contactPhone);
 
-                    var thumbnail = Windows.Storage.Streams.RandomAccessStreamReference.createFromUri(new Windows.Foundation.Uri("ms-appx-web://" + img));
+                    var thumbnail = Windows.Storage.Streams.RandomAccessStreamReference.createFromUri(new Windows.Foundation.Uri(document.baseURI, img));
                     contact.thumbnail = thumbnail;
 
                     return contacts.SaveContactAsync(contact)

@@ -101,9 +101,13 @@
     // Register for activation
     if (window.Windows && window.Windows.UI && window.Windows.UI.WebUI) {
         try {
+            // Native JavaScript or Progressive Web Application (WWAHost)
+            // Registering for activation will throw an exception outside of WWAHost
             Windows.UI.WebUI.WebUIApplication.onactivated = activationService.OnActivated;
         }
         catch (e) {
+            // Hybrid Web Application (WebView)
+            // Register for activation on injected IWebUIApplication implementation
             WebUIApplication.onactivated = activationService.OnActivated;
         }
     }

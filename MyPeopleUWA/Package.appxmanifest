@@ -5,7 +5,7 @@
   <Properties>
     <DisplayName>MyPeopleUWA</DisplayName>
     <PublisherDisplayName>shane</PublisherDisplayName>
-    <Logo>Web\images\StoreLogo.png</Logo>
+    <Logo>images\StoreLogo.png</Logo>
   </Properties>
   <Dependencies>
     <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.0.0" MaxVersionTested="10.0.0.0" />
@@ -15,17 +15,17 @@
   </Resources>
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="MyPeopleUWA.App">
-      <uap:VisualElements DisplayName="MyPeopleUWA" Square150x150Logo="Web\images\Square150x150Logo.png" Square44x44Logo="Web\images\Square44x44Logo.png" Description="MyPeopleUWA" BackgroundColor="transparent">
-        <uap:DefaultTile Wide310x150Logo="Web\images\Wide310x150Logo.png">
+      <uap:VisualElements DisplayName="MyPeopleUWA" Square150x150Logo="images\Square150x150Logo.png" Square44x44Logo="images\Square44x44Logo.png" Description="MyPeopleUWA" BackgroundColor="transparent">
+        <uap:DefaultTile Wide310x150Logo="images\Wide310x150Logo.png">
           <uap:ShowNameOnTiles>
             <uap:ShowOn Tile="square150x150Logo" />
             <uap:ShowOn Tile="wide310x150Logo" />
           </uap:ShowNameOnTiles>
         </uap:DefaultTile>
-        <uap:SplashScreen Image="Web\images\SplashScreen.png" />
+        <uap:SplashScreen Image="images\SplashScreen.png" />
       </uap:VisualElements>
       <uap:ApplicationContentUriRules>
-        <uap:Rule Match="ms-appx-web:///Web/index.html" Type="include" WindowsRuntimeAccess="all" />
+        <uap:Rule Match="ms-appx-web:///index.html" Type="include" WindowsRuntimeAccess="all" />
       </uap:ApplicationContentUriRules>
     </Application>
   </Applications>
