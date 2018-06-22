@@ -40,7 +40,7 @@
         function onContactPanelActivated(args) {
             logger.Log("ContectPanel Activated");
 
-            var contactPanel = args.contactPanel; // TODO: Check that this is the right arg
+            var contactPanel = args.contactPanel;
             document.myPeople.RegisterContactPanel(contactPanel);
         }
 
