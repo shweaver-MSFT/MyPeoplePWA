@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:uap4="http://schemas.microsoft.com/appx/manifest/uap/windows10/4" IgnorableNamespaces="uap mp">
   <Identity Name="6632b0ae-54da-4590-b76c-ae675ea744d3" Publisher="CN=shane" Version="1.0.0.0" />
   <mp:PhoneIdentity PhoneProductId="6632b0ae-54da-4590-b76c-ae675ea744d3" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
@@ -27,6 +27,16 @@
       <uap:ApplicationContentUriRules>
         <uap:Rule Match="ms-appx-web:///index.html" Type="include" WindowsRuntimeAccess="all" />
       </uap:ApplicationContentUriRules>
+      <Extensions>
+        <uap4:Extension Category="windows.contactPanel">
+          <uap4:ContactPanel SupportsUnknownContacts="true" />
+        </uap4:Extension>
+        <uap:Extension Category="windows.protocol">
+          <uap:Protocol Name="mypeoplepwa">
+            <uap:DisplayName>MyPeoplePWA App Extension</uap:DisplayName>
+          </uap:Protocol>
+        </uap:Extension>
+      </Extensions>
     </Application>
   </Applications>
   <Capabilities>
