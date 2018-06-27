@@ -188,12 +188,12 @@
 
                 // Close the panel on app launch
                 registeredContactPanel.ClosePanel();
-            }.bind(this);
+            }.bind(this));
 
             // Occurs when the Contact Panel is closing.
             contactPanel.addEventListener("closing", function () {
                 logger.Log("Registered ContactPanel Closing");
-            }.bind(this);
+            }.bind(this));
 
             // Set the header color
             contactPanel.headerColor = Windows.UI.Colors.Red;

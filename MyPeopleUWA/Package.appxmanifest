@@ -26,6 +26,7 @@
       </uap:VisualElements>
       <uap:ApplicationContentUriRules>
         <uap:Rule Match="ms-appx-web:///index.html" Type="include" WindowsRuntimeAccess="all" />
+        <uap:Rule Match="ms-appx-web:///contactPanel.html" Type="include" WindowsRuntimeAccess="all" />
       </uap:ApplicationContentUriRules>
       <Extensions>
         <uap4:Extension Category="windows.contactPanel">
