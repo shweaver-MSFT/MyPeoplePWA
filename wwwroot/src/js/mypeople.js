@@ -178,12 +178,13 @@
         // (if not set, it will default to the system theme) and to programmatically close the contact panel.
         // https://docs.microsoft.com/en-us/windows/uwp/contacts-and-calendar/my-people-support#running-in-the-contact-panel
         this.RegisterContactPanel = function (contactPanel) {
+            logger.Log("ContactPanel Registered");
 
             registeredContactPanel = contactPanel;
 
             // Occurs when the user clicks the Launch Full App button in the Contact Panel.
             contactPanel.addEventListener("launchFullAppRequested", function () {
-                logger.Log("Registered ContactPanel LaunchFullAppRequested");
+                logger.Log("ContactPanel LaunchFullAppRequested");
                 document.activation.LaunchSelf();
 
                 // Close the panel on app launch
@@ -192,11 +193,12 @@
 
             // Occurs when the Contact Panel is closing.
             contactPanel.addEventListener("closing", function () {
-                logger.Log("Registered ContactPanel Closing");
+                logger.Log("ContactPanel Closing");
             }.bind(this));
 
             // Set the header color
-            contactPanel.headerColor = Windows.UI.Colors.Red;
+            var c = app.TitleBarColor;
+            contactPanel.headerColor = Windows.UI.ColorHelper.fromArgb(c.a, c.r, c.g, c.b);
 
         }.bind(this);
     };
