@@ -23,7 +23,8 @@
         function onProtocolActivated(args) {
             logger.Log("Protocol Activated");
 
-            var protocol = args.Uri.absoluteUri;
+            var protocol = args.detail[0].uri.absoluteUri;
+
             // TODO: Handle protocol activation
         }
 
